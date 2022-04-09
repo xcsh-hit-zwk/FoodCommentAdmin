@@ -20,4 +20,23 @@ class FoodCommentAdminApplicationTests {
         users.forEach(System.out::println);
     }
 
+    // 测试插入
+    @Test
+    public void testInsert(){
+        User user = new User();
+        user.setId("4");
+        user.setUserId("4");
+        user.setPassword("123456");
+        user.setNickname("xcsh004");
+        user.setCreateTime("4");
+        user.setModTime("4");
+        user.setHasLogin(false);
+        user.setHasDelete(false);
+
+        int result = userMapper.insert(user);
+        System.out.println(result);
+        System.out.println(user);
+    }
+
+
 }
