@@ -15,5 +15,7 @@ public class User {
     private String nickname;
     private String createTime;
     private String modTime;
+    private Boolean hasLogin;
     private Boolean hasDelete;
+
 }
