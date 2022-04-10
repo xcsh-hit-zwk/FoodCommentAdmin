@@ -52,4 +52,19 @@ class FoodCommentAdminApplicationTests {
         R r = userController.login(account);
         System.out.println(r);
     }
+
+    @Test
+    public void testSignUp(){
+        User user = new User();
+        user.setUserId("4");
+        user.setPassword("123456");
+        user.setNickname("xcsh005");
+        user.setCreateTime("5");
+        user.setModTime("5");
+        user.setHasLogin(false);
+        user.setHasDelete(false);
+
+        R r = userController.signUp(user);
+        System.out.println(r);
+    }
 }
