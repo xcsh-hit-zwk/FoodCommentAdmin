@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
         queryWrapper.eq("user_id",userId);
 
         Account sqlAccount = accountMapper.selectOne(queryWrapper);
-        if(sqlAccount != null){
+        if(sqlAccount != null && sqlAccount.getHasDelete().booleanValue() == false){
             if(account.getPassword().equals(sqlAccount.getPassword())){
                 return true;
             }
