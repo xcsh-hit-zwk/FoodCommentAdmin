@@ -14,10 +14,9 @@ import lombok.Data;
 @TableName("restaurantlabel")
 public class RestaurantLabel {
 
-    @TableId(value = "restaurantinfo_id", type = IdType.ASSIGN_ID)
-    private String restaurantinfoId;
-
+    @TableId(value = "label_id", type = IdType.ASSIGN_ID)
     private String labelId;
+
     private String restaurantId;
     private Integer labelLike;
     private String labelInfo;
