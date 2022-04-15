@@ -2,13 +2,13 @@ package com.example.foodcommentadmin;
 
 import com.example.foodcommentadmin.common.R;
 import com.example.foodcommentadmin.controller.UserController;
-import com.example.foodcommentadmin.mapper.UserMapper;
-import com.example.foodcommentadmin.pojo.Account;
-import com.example.foodcommentadmin.pojo.User;
+import com.example.foodcommentadmin.mapper.*;
+import com.example.foodcommentadmin.pojo.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.nio.file.LinkOption;
 import java.util.List;
 
 @SpringBootTest
@@ -19,11 +19,76 @@ class FoodCommentAdminApplicationTests {
     @Autowired
     private UserController userController;
 
+    @Autowired
+    private CommentMapper commentMapper;
+
+    @Autowired
+    private FoodMapper foodMapper;
+
+    @Autowired
+    private RestaurantInfoMapper restaurantInfoMapper;
+
+    @Autowired
+    private RestaurantLabelMapper restaurantLabelMapper;
+
     @Test
     void contextLoads() {
         //参数是一个Wrapper，是一个条件构造器，不用就写null
         List<User> users = userMapper.selectList(null);
         users.forEach(System.out::println);
+    }
+
+    // 测试Comment表读取
+    @Test
+    void testReadComment(){
+        List<Comment> comments = commentMapper.selectList(null);
+        comments.forEach(System.out::println);
+
+    }
+
+    // 测试Food表读取
+    @Test
+    void testReadFood(){
+        List<Food> foods = foodMapper.selectList(null);
+        foods.forEach(System.out::println);
+    }
+
+    // 测试RestaurantInfo表读取
+    @Test
+    void testReadRestaurantInfo(){
+        List<RestaurantInfo> restaurantInfos = restaurantInfoMapper.selectList(null);
+        restaurantInfos.forEach(System.out::println);
+    }
+
+    // 测试RestaurantLabel表读取
+    @Test
+    void testReadRestaurantLabel(){
+        List<RestaurantLabel> restaurantLabels = restaurantLabelMapper.selectList(null);
+        restaurantLabels.forEach(System.out::println);
+    }
+
+    // 测试Comment表插入
+    @Test
+    void testInsertComment(){
+
+    }
+
+    // 测试Food表插入
+    @Test
+    void testInsertFood(){
+
+    }
+
+    // 测试RestaurantInfo表插入
+    @Test
+    void testInsertRestaurantInfo(){
+
+    }
+
+    // 测试RestaurantLabel表插入
+    @Test
+    void testInsertRestaurantLabel(){
+
     }
 
     // 测试插入
