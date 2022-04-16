@@ -1,8 +1,6 @@
 package com.example.foodcommentadmin.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
@@ -26,8 +24,14 @@ public class RestaurantInfo extends Model<RestaurantInfo> {
     private String restaurantProvince;
     private String restaurantCity;
     private String restaurantBlock;
+
+    @TableField(fill = FieldFill.INSERT)
     private String createTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String modTime;
+
+    @TableField(fill = FieldFill.INSERT)
     private Boolean hasDelete;
 
 }

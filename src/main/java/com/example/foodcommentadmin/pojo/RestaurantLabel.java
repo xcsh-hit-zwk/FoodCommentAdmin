@@ -1,8 +1,6 @@
 package com.example.foodcommentadmin.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 /**
@@ -20,7 +18,13 @@ public class RestaurantLabel {
     private String restaurantId;
     private Integer labelLike;
     private String labelInfo;
+
+    @TableField(fill = FieldFill.INSERT)
     private String createTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String modTime;
+
+    @TableField(fill = FieldFill.INSERT)
     private Boolean hasDelete;
 }

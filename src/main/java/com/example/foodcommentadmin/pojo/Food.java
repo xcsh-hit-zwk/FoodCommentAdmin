@@ -1,8 +1,6 @@
 package com.example.foodcommentadmin.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
@@ -22,8 +20,14 @@ public class Food extends Model<Food> {
     private String restaurantId;
     private Integer foodLike;
     private String foodPicture;
+
+    @TableField(fill = FieldFill.INSERT)
     private Boolean hasDelete;
+
+    @TableField(fill = FieldFill.INSERT)
     private String createTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String modTime;
 
 }
