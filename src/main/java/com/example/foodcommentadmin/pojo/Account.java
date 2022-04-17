@@ -14,5 +14,5 @@ public class Account {
     private String password;
 
     @TableField(fill = FieldFill.INSERT)
-    private Boolean hasDelete;
+    private Boolean hasLogin;
 }

@@ -8,7 +8,6 @@ import com.example.foodcommentadmin.pojo.User;
 import com.example.foodcommentadmin.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.sql.Wrapper;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -19,15 +18,16 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Override
-    public boolean login(Account account){
+    public Boolean login(Account account){
 
         String userId =  account.getUserId();
 
         QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id",userId);
+        queryWrapper.eq("user_id",userId)
+                    .eq("has_delete", false);
 
         Account sqlAccount = accountMapper.selectOne(queryWrapper);
-        if(sqlAccount != null && sqlAccount.getHasDelete().booleanValue() == false){
+        if(sqlAccount != null){
             if(account.getPassword().equals(sqlAccount.getPassword())){
                 return true;
             }
@@ -36,17 +36,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean signUp(User user) {
+    public Boolean signUp(User user) {
         String userId = user.getUserId();
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId);
 
         User sqlUser = userMapper.selectOne(queryWrapper);
         if(sqlUser == null){
-            int result = userMapper.insert(user);
-            if(result == 1){
-                return true;
-            }
+            userMapper.insert(user);
+            return true;
         }
 
         return false;
