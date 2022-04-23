@@ -15,7 +15,12 @@ public enum ResultCode {
 
     USERNAME_EXISTS(false, 30001, "用户名已存在!"),
     USER_NOT_EXIST(false, 30002, "用户不存在!"),
-    USER_HAS_LOGIN(false, 30003, "用户已登录");
+    USER_HAS_LOGIN(false, 30003, "用户已登录"),
+    SOME_INSERT_FAILED(false, 30004, "部分数据插入异常！"),
+
+    FILE_NAME_ERROR(false, 40001, "获取文件名异常!"),
+    FILE_GET_STREAM_ERROR(false, 40001, "获取文件InputStream异常!"),
+    FILE_TYPE_NOT_SUPPORTED_ERROR(false, 40001, "不支持的文件类型!");
 
 
     // 响应是否成功

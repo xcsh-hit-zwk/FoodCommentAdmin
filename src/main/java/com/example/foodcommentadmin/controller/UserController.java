@@ -29,6 +29,6 @@ public class UserController {
         if(userService.signUp(user)){
             return R.ok();
         }
-        return R.setResult(ResultCode.USER_NOT_EXIST);
+        return R.setResult(ResultCode.USERNAME_EXISTS);
     }
 }

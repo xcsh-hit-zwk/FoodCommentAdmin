@@ -7,7 +7,6 @@ import lombok.Data;
 import org.springframework.stereotype.Repository;
 
 @Data
-@TableName("user")
 public class Account {
 
     private String userId;

@@ -24,7 +24,7 @@ public class RestaurantOverViewController {
     @Autowired
     private RestaurantOverViewService restaurantOverViewService;
 
-    @PostMapping("/getTotal")
+    @PostMapping("/GetTotal")
     public R getTotalRestaurantOverView(@Validated @RequestBody String JsonCity){
         String city = JSON.parseObject(JsonCity).get("city").toString();
         List<RestaurantOverView> restaurantOverViewList = restaurantOverViewService
@@ -35,7 +35,7 @@ public class RestaurantOverViewController {
         return R.setResult(ResultCode.PARAM_ERROR);
     }
 
-    @PostMapping("/getByName")
+    @PostMapping("/GetByName")
     public R getNameRestaurantOverView(@Validated @RequestBody String JsonName){
         String name = JSON.parseObject(JsonName).get("name").toString();
         List<RestaurantOverView> restaurantOverViewList = restaurantOverViewService
@@ -46,7 +46,7 @@ public class RestaurantOverViewController {
         return R.setResult(ResultCode.PARAM_ERROR);
     }
 
-    @PostMapping("/getByTag")
+    @PostMapping("/GetByTag")
     public R getTagRestaurantOverView(@Validated @RequestBody String JsonTag){
         String tag = JSON.parseObject(JsonTag).get("tag").toString();
         List<RestaurantOverView> restaurantOverViewList = restaurantOverViewService
@@ -57,7 +57,7 @@ public class RestaurantOverViewController {
         return R.setResult(ResultCode.PARAM_ERROR);
     }
 
-    @PostMapping("/getByFood")
+    @PostMapping("/GetByFood")
     public R getFoodRestaurantOverView(@Validated @RequestBody String JsonFood){
         String food = JSON.parseObject(JsonFood).get("food").toString();
         List<RestaurantOverView> restaurantOverViewList = restaurantOverViewService
@@ -68,7 +68,7 @@ public class RestaurantOverViewController {
         return R.setResult(ResultCode.PARAM_ERROR);
     }
 
-    @PostMapping("/getByBlock")
+    @PostMapping("/GetByBlock")
     public R getBlockRestaurantOverView(@Validated @RequestBody String JsonBlock){
         String block = JSON.parseObject(JsonBlock).get("block").toString();
         List<RestaurantOverView> restaurantOverViewList = restaurantOverViewService
