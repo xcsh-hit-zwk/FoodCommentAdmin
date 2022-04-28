@@ -4,16 +4,20 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
+/**
+ * description: 管理员表实体类
+ * @author: zhangweikun
+ * @create: 2022-4-28 8:59
+ */
 @Data
-@TableName("user")
-public class User extends Model<User> {
+@TableName("restaurantAdmin")
+public class AdminEntity extends Model<AdminEntity> {
 
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
-    private String id;
+    @TableId(value = "admin_id", type = IdType.ASSIGN_ID)
+    private String adminId;
 
-    private String userId;
-    private String password;
-    private String nickname;
+    private String adminUsername;
+    private String adminPassword;
 
     @TableField(fill = FieldFill.INSERT)
     private String createTime;
@@ -23,5 +27,4 @@ public class User extends Model<User> {
 
     @TableField(fill = FieldFill.INSERT)
     private Boolean hasDelete;
-
 }

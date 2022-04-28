@@ -33,7 +33,6 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
 
         log.info("start default value insert fill......");
         this.setFieldValByName("hasDelete", false, metaObject);
-        this.setFieldValByName("hasLogin", false, metaObject);
     }
 
     @Override

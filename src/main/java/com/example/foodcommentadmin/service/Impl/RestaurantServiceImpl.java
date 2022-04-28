@@ -1,6 +1,7 @@
 package com.example.foodcommentadmin.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.foodcommentadmin.mapper.AdminMapper;
 import com.example.foodcommentadmin.mapper.FoodMapper;
 import com.example.foodcommentadmin.mapper.RestaurantInfoMapper;
 import com.example.foodcommentadmin.pojo.*;
@@ -25,51 +26,6 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Autowired
     private FoodMapper foodMapper;
-
-    /**
-     * 餐厅注册方法，通过检查已有账户名来判断是否已经注册
-     * @param restaurantInfo
-     * @return 注册结果
-     */
-    @Override
-    public Boolean signUp(RestaurantInfo restaurantInfo) {
-        String name = restaurantInfo.getRestaurantName();
-        QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
-        restaurantInfoQueryWrapper.eq("restaurant_name", name);
-
-        RestaurantInfo sqlRestaurantInfo = restaurantInfoMapper
-                .selectOne(restaurantInfoQueryWrapper);
-
-        if(sqlRestaurantInfo != null){
-            return false;
-        }
-
-        restaurantInfoMapper.insert(restaurantInfo);
-
-        return true;
-    }
-
-    /**
-     * 餐厅登录方法，通过比对已有账户名称来确认是否可以登录
-     * @param restaurantAccount
-     * @return 登陆结果
-     */
-    @Override
-    public Boolean login(RestaurantAccount restaurantAccount) {
-        String restaurantName = restaurantAccount.getRestaurantName();
-        QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
-        restaurantInfoQueryWrapper.eq("restaurant_name", restaurantName);
-
-        RestaurantInfo restaurantInfo = restaurantInfoMapper
-                .selectOne(restaurantInfoQueryWrapper);
-        if(restaurantInfo != null){
-            if(restaurantInfo.getRestaurantPassword().equals(restaurantAccount.getRestaurantPassword()))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
 
      /** 向Food表中添加餐厅招牌菜
      * @param restaurantName

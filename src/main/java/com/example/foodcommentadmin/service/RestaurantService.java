@@ -11,13 +11,7 @@ import java.util.List;
  **/
 public interface RestaurantService {
 
-    /**
-     * 餐厅注册登录相关接口
-     */
-    // 餐厅注册接口
-    Boolean signUp(RestaurantInfo restaurantInfo);
-    // 餐厅登录接口
-    Boolean login(RestaurantAccount restaurantAccount);
+
 
     /**
      * 餐厅招牌菜相关接口

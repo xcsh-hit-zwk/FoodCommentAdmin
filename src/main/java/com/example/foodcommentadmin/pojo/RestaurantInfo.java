@@ -17,7 +17,6 @@ public class RestaurantInfo extends Model<RestaurantInfo> {
     private String restaurantId;
 
     private String restaurantName;
-    private String restaurantPassword;
     private String restaurantTag;
     private String restaurantPosition;
     private String restaurantPhone;

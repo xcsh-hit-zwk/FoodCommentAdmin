@@ -8,27 +8,26 @@ import com.example.foodcommentadmin.pojo.User;
 import com.example.foodcommentadmin.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private AccountMapper accountMapper;
     @Autowired
     private UserMapper userMapper;
 
     @Override
     public Boolean login(Account account){
 
-        String userId =  account.getUserId();
+        String userId =  account.getUsername();
 
-        QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id",userId)
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("user_id",userId)
                     .eq("has_delete", false);
 
-        Account sqlAccount = accountMapper.selectOne(queryWrapper);
-        if(sqlAccount != null){
-            if(account.getPassword().equals(sqlAccount.getPassword())){
+        User user = userMapper.selectOne(userQueryWrapper);
+        if(user != null){
+            if(account.getPassword().equals(user.getPassword())){
                 return true;
             }
         }
