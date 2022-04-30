@@ -3,9 +3,6 @@ package com.example.foodcommentadmin.common;
 import com.example.foodcommentadmin.enums.ResultCode;
 import lombok.Data;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Data
 public class R {
     private Boolean success;

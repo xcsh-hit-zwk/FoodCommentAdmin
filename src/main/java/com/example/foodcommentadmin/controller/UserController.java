@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.foodcommentadmin.common.R;
 import com.example.foodcommentadmin.enums.ResultCode;
 import com.example.foodcommentadmin.pojo.Account;
+import com.example.foodcommentadmin.pojo.RegisterAccount;
 import com.example.foodcommentadmin.pojo.User;
 import com.example.foodcommentadmin.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,27 +25,18 @@ public class UserController {
 
     @PostMapping("/Login")
     public R login(@Validated @RequestBody Account account){
+        log.info(account.getUsername());
+        log.info(account.getPassword());
         if(userService.login(account)){
             return R.ok();
         }
         return R.setResult(ResultCode.USER_NOT_EXIST);
     }
-//    @PostMapping("/Login")
-//    public R login(@Validated @RequestBody String json){
-//        log.info(json);
-//        Account account = new Account();
-//        account.setUserId(JSON.parseObject(json).get("username").toString());
-//        account.setPassword(JSON.parseObject(json).get("password").toString());
-//        log.info(account.getUserId(), account.getPassword());
-//        if(userService.login(account)){
-//            return R.ok();
-//        }
-//        return R.setResult(ResultCode.USER_NOT_EXIST);
-//    }
 
     @PostMapping("/SignUp")
-    public R signUp(@Validated @RequestBody User user){
-        if(userService.signUp(user)){
+    public R signUp(@Validated @RequestBody RegisterAccount registerAccount){
+
+        if(userService.signUp(registerAccount)){
             return R.ok();
         }
         return R.setResult(ResultCode.USERNAME_EXISTS);

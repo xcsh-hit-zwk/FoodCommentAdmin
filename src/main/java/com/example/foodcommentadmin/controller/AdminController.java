@@ -4,6 +4,7 @@ import com.example.foodcommentadmin.common.R;
 import com.example.foodcommentadmin.enums.ResultCode;
 import com.example.foodcommentadmin.pojo.AdminAccount;
 import com.example.foodcommentadmin.service.AdminService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author: zhangweikun
  * @create: 2022-4-28 9:19
  */
+@Slf4j
 @RestController
 @RequestMapping("/Admin")
 public class AdminController {
@@ -25,6 +27,8 @@ public class AdminController {
 
     @PostMapping("/Login")
     public R login(@Validated @RequestBody AdminAccount adminAccount){
+        log.info(adminAccount.getUsername());
+        log.info(adminAccount.getPassword());
         if(adminService.login(adminAccount) == true){
             return R.ok();
         }
