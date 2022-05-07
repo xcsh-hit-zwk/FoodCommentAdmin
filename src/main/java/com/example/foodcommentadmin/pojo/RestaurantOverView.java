@@ -12,7 +12,6 @@ import lombok.Data;
 @Data
 public class RestaurantOverView {
 
-    private String restaurantId;
     private String restaurantName;
     private Integer likes;
     private String restaurantTag;
@@ -21,14 +20,6 @@ public class RestaurantOverView {
     private String restaurantProvince;
     private String restaurantCity;
     private String restaurantBlock;
-
-    public String getRestaurantId() {
-        return restaurantId;
-    }
-
-    public void setRestaurantId(String restaurantId) {
-        this.restaurantId = restaurantId;
-    }
 
     public String getRestaurantName() {
         return restaurantName;
@@ -95,25 +86,15 @@ public class RestaurantOverView {
     }
 
     public void printAll(){
-        System.out.print("restaurantId: " + restaurantId + ", ");
-        System.out.print("restaurantName: " + restaurantName + ", ");
-        System.out.print("likes: " + String.valueOf(likes) + ", ");
-        System.out.print("restaurantTag: " + restaurantTag + ", ");
-        System.out.print("restaurantPosition: " + restaurantPosition + ", ");
-        System.out.print("restaurantImage: " + restaurantImage + ", ");
-        System.out.print("restaurantProvince: " + restaurantProvince + ", ");
-        System.out.print("restaurantCity: " + restaurantCity + ", ");
-        System.out.print("restaurantBlock: " + restaurantBlock + "\n");
+        System.out.println("---------------对象为: RestaurantOverView---------------");
+        System.out.println("restaurantName: " + restaurantName + ", ");
+        System.out.println("likes: " + String.valueOf(likes) + ", ");
+        System.out.println("restaurantTag: " + restaurantTag + ", ");
+        System.out.println("restaurantPosition: " + restaurantPosition + ", ");
+        System.out.println("restaurantImage: " + restaurantImage + ", ");
+        System.out.println("restaurantProvince: " + restaurantProvince + ", ");
+        System.out.println("restaurantCity: " + restaurantCity + ", ");
+        System.out.println("restaurantBlock: " + restaurantBlock + "\n");
+        System.out.println("-------------------------------------------------------");
     }
-    /*
-    private String restaurantId;
-    private String restaurantName;
-    private Integer likes;
-    private String restaurantTag;
-    private String restaurantPosition;
-    private String restaurantImage;
-    private String restaurantProvince;
-    private String restaurantCity;
-    private String restaurantBlock;
-     */
 }

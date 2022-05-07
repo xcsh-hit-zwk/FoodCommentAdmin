@@ -17,6 +17,7 @@ public enum ResultCode {
     USER_NOT_EXIST(false, 30002, "用户不存在!"),
     USER_HAS_LOGIN(false, 30003, "用户已登录"),
     SOME_INSERT_FAILED(false, 30004, "部分数据插入异常！"),
+    EMPTY_SET(false, 30005, "数据集为空"),
 
     FILE_NAME_ERROR(false, 40001, "获取文件名异常!"),
     FILE_GET_STREAM_ERROR(false, 40001, "获取文件InputStream异常!"),

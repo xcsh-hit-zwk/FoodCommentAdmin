@@ -4,15 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.foodcommentadmin.mapper.FoodMapper;
 import com.example.foodcommentadmin.mapper.RestaurantInfoMapper;
 import com.example.foodcommentadmin.mapper.RestaurantLabelMapper;
-import com.example.foodcommentadmin.pojo.Food;
-import com.example.foodcommentadmin.pojo.RestaurantInfo;
-import com.example.foodcommentadmin.pojo.RestaurantLabel;
-import com.example.foodcommentadmin.pojo.RestaurantOverView;
+import com.example.foodcommentadmin.pojo.*;
 import com.example.foodcommentadmin.service.RestaurantOverViewService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -36,7 +34,145 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
     private FoodMapper foodMapper;
 
     @Override
-    public List<RestaurantOverView> totalRestaurantOverView(String city) {
+    public List<RestaurantOverView> totalRestaurantOverView(){
+
+        List<RestaurantOverView> restaurantOverViewList = new ArrayList<>();
+
+        QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
+        restaurantInfoQueryWrapper.eq("has_delete", false);
+        List<RestaurantInfo> restaurantInfoList = restaurantInfoMapper
+                .selectList(restaurantInfoQueryWrapper);
+
+        if(restaurantInfoList.isEmpty()){
+            return null;
+        }
+
+        // 填充RestaurantOverView信息
+        Iterator<RestaurantInfo> restaurantInfoIterator = restaurantInfoList.iterator();
+        while (restaurantInfoIterator.hasNext()){
+
+            RestaurantInfo restaurantInfo = restaurantInfoIterator.next();
+            RestaurantOverView restaurantOverView = new RestaurantOverView();
+
+            // 填充属于RestaurantInfo的信息
+            restaurantOverView.setRestaurantName(restaurantInfo.getRestaurantName());
+            restaurantOverView.setRestaurantTag(restaurantInfo.getRestaurantTag());
+            restaurantOverView.setRestaurantPosition(restaurantInfo.getRestaurantPosition());
+            restaurantOverView.setRestaurantImage(restaurantInfo.getRestaurantImage());
+            restaurantOverView.setRestaurantProvince(restaurantInfo.getRestaurantProvince());
+            restaurantOverView.setRestaurantCity(restaurantInfo.getRestaurantCity());
+            restaurantOverView.setRestaurantBlock(restaurantInfo.getRestaurantBlock());
+
+            // 填充点赞数
+            QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+            QueryWrapper<RestaurantLabel> restaurantLabelQueryWrapper = new QueryWrapper<>();
+
+            String restaurantId = restaurantInfo.getRestaurantId();
+            foodQueryWrapper.eq("restaurant_id", restaurantId)
+                    .eq("has_delete", false);
+            restaurantLabelQueryWrapper.eq("restaurant_id", restaurantId)
+                    .eq("has_delete", false);
+
+            List<Food> foodList = new ArrayList<>();
+            List<RestaurantLabel> restaurantLabelList = new ArrayList<>();
+
+            foodList = foodMapper.selectList(foodQueryWrapper);
+            restaurantLabelList = restaurantLabelMapper.selectList(restaurantLabelQueryWrapper);
+
+            // 添加点赞数
+            int likes = 0;
+            if(!foodList.isEmpty() && !restaurantLabelList.isEmpty()){
+
+                Iterator<Food> foodIterator = foodList.iterator();
+                Iterator<RestaurantLabel> restaurantLabelIterator = restaurantLabelList.iterator();
+
+                while (foodIterator.hasNext()){
+                    Food food = foodIterator.next();
+                    likes += food.getFoodLike();
+                }
+
+                while (restaurantLabelIterator.hasNext()){
+                    RestaurantLabel restaurantLabel = restaurantLabelIterator.next();
+                    likes += restaurantLabel.getLabelLike();
+                }
+            }
+            restaurantOverView.setLikes(likes);
+
+            restaurantOverViewList.add(restaurantOverView);
+        }
+
+        return restaurantOverViewList;
+    }
+
+    // 全部招牌菜，用于返回给管理员
+    public List<FoodOverView> totalFoodOverView(){
+
+        List<FoodOverView> foodOverViewList = new ArrayList<>();
+
+        List<Food> foodList = new ArrayList<>();
+        QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+        foodQueryWrapper.eq("has_delete", false);
+
+        foodList = foodMapper.selectList(foodQueryWrapper);
+        if(foodList.isEmpty()){
+            return null;
+        }
+
+        Iterator<Food> foodIterator = foodList.iterator();
+        while (foodIterator.hasNext()){
+            Food food = foodIterator.next();
+            FoodOverView foodOverView = new FoodOverView();
+
+            foodOverView.setFoodName(food.getFoodName());
+            foodOverView.setFoodLikes(food.getFoodLike());
+            foodOverView.setFoodImage(food.getFoodPicture());
+
+            QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
+            restaurantInfoQueryWrapper.eq("restaurant_id", food.getRestaurantId());
+            RestaurantInfo restaurantInfo = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
+
+            foodOverView.setRestaurantName(restaurantInfo.getRestaurantName());
+
+            foodOverViewList.add(foodOverView);
+
+        }
+
+        return foodOverViewList;
+    }
+
+    // 全部标签，用于返回给管理员
+    public List<LabelOverView> totalLabelOverView(){
+
+        List<LabelOverView> labelOverViewList = new ArrayList<>();
+
+        QueryWrapper<RestaurantLabel> restaurantLabelQueryWrapper = new QueryWrapper<>();
+        List<RestaurantLabel> restaurantLabelList = restaurantLabelMapper
+                .selectList(restaurantLabelQueryWrapper);
+        if(restaurantLabelList.isEmpty()){
+            return null;
+        }
+
+        Iterator<RestaurantLabel> restaurantLabelIterator = restaurantLabelList.iterator();
+        while (restaurantLabelIterator.hasNext()){
+            RestaurantLabel restaurantLabel = restaurantLabelIterator.next();
+            LabelOverView labelOverView = new LabelOverView();
+            labelOverView.setLabelName(restaurantLabel.getLabelInfo());
+
+            QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
+            restaurantInfoQueryWrapper.eq("restaurant_id", restaurantLabel.getRestaurantId());
+            RestaurantInfo restaurantInfo = restaurantInfoMapper
+                    .selectOne(restaurantInfoQueryWrapper);
+
+            labelOverView.setRestaurantName(restaurantInfo.getRestaurantName());
+
+            labelOverViewList.add(labelOverView);
+        }
+
+        return labelOverViewList;
+    }
+
+    @Override
+    public List<RestaurantOverView> cityRestaurantOverView(String city) {
 
         List<RestaurantOverView> restaurantOverViewList = new ArrayList<>();
 
@@ -47,7 +183,7 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
         List<RestaurantInfo> restaurantInfos = restaurantInfoMapper
                 .selectList(restaurantInfoQueryWrapper);
 
-        if(restaurantInfos.equals(null)){
+        if(restaurantInfos.isEmpty()){
             return null;
         }
 
@@ -63,12 +199,11 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
                     .eq("has_delete", false);
             restaurantLabels = restaurantLabelMapper.selectList(restaurantLabelQueryWrapper);
             // 如果标签List是空的，说明饭店没标签，是有问题的查询，需要返回null
-            if(restaurantLabels != null){
+            if(!restaurantLabels.isEmpty()){
                 // 这个sum的计算方法以后还要修改
                 int sum = 0;
                 RestaurantOverView restaurantOverView = new RestaurantOverView();
 
-                restaurantOverView.setRestaurantId(restaurantInfo.getRestaurantId());
                 restaurantOverView.setRestaurantName(restaurantInfo.getRestaurantName());
                 restaurantOverView.setRestaurantTag(restaurantInfo.getRestaurantTag());
                 restaurantOverView.setRestaurantPosition(restaurantInfo.getRestaurantPosition());
@@ -105,7 +240,7 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
         List<RestaurantInfo> restaurantInfos = restaurantInfoMapper
                 .selectList(restaurantInfoQueryWrapper);
 
-        if(restaurantInfos.equals(null)){
+        if(restaurantInfos.isEmpty()){
             return null;
         }
 
@@ -121,12 +256,11 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
                     .eq("has_delete", false);
             restaurantLabels = restaurantLabelMapper.selectList(restaurantLabelQueryWrapper);
             // 如果标签List是空的，说明饭店没标签，是有问题的查询，需要返回null
-            if(restaurantLabels != null){
+            if(!restaurantLabels.isEmpty()){
                 // 这个sum的计算方法以后还要修改
                 int sum = 0;
                 RestaurantOverView restaurantOverView = new RestaurantOverView();
 
-                restaurantOverView.setRestaurantId(restaurantInfo.getRestaurantId());
                 restaurantOverView.setRestaurantName(restaurantInfo.getRestaurantName());
                 restaurantOverView.setRestaurantTag(restaurantInfo.getRestaurantTag());
                 restaurantOverView.setRestaurantPosition(restaurantInfo.getRestaurantPosition());
@@ -163,7 +297,7 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
         List<RestaurantInfo> restaurantInfos = restaurantInfoMapper
                 .selectList(restaurantInfoQueryWrapper);
 
-        if(restaurantInfos.equals(null)){
+        if(!restaurantInfos.isEmpty()){
             return null;
         }
 
@@ -179,12 +313,11 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
                     .eq("has_delete", false);
             restaurantLabels = restaurantLabelMapper.selectList(restaurantLabelQueryWrapper);
             // 如果标签List是空的，说明饭店没标签，是有问题的查询，需要返回null
-            if(restaurantLabels != null){
+            if(!restaurantLabels.isEmpty()){
                 // 这个sum的计算方法以后还要修改
                 int sum = 0;
                 RestaurantOverView restaurantOverView = new RestaurantOverView();
 
-                restaurantOverView.setRestaurantId(restaurantInfo.getRestaurantId());
                 restaurantOverView.setRestaurantName(restaurantInfo.getRestaurantName());
                 restaurantOverView.setRestaurantTag(restaurantInfo.getRestaurantTag());
                 restaurantOverView.setRestaurantPosition(restaurantInfo.getRestaurantPosition());
@@ -219,7 +352,7 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
         foodQueryWrapper.like("food_name", food)
                 .eq("has_delete", false);
         List<Food> foodList = foodMapper.selectList(foodQueryWrapper);
-        if (foodList.equals(null)){
+        if (foodList.isEmpty()){
             return null;
         }
 
@@ -241,7 +374,6 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
                 return null;
             }
 
-            restaurantOverView.setRestaurantId(restaurantInfo.getRestaurantId());
             restaurantOverView.setRestaurantName(restaurantInfo.getRestaurantName());
             restaurantOverView.setRestaurantTag(restaurantInfo.getRestaurantTag());
             restaurantOverView.setRestaurantPosition(restaurantInfo.getRestaurantPosition());
@@ -255,7 +387,7 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
                     .eq("has_delete", false);
             List<RestaurantLabel> restaurantLabels = restaurantLabelMapper
                     .selectList(restaurantLabelQueryWrapper);
-            if(restaurantLabels == null){
+            if(restaurantLabels.isEmpty()){
                 return null;
             }
             int sum = 0;
@@ -286,7 +418,7 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
         List<RestaurantInfo> restaurantInfos = restaurantInfoMapper
                 .selectList(restaurantInfoQueryWrapper);
 
-        if(restaurantInfos.equals(null)){
+        if(restaurantInfos.isEmpty()){
             return null;
         }
 
@@ -302,12 +434,11 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
                     .eq("has_delete", false);
             restaurantLabels = restaurantLabelMapper.selectList(restaurantLabelQueryWrapper);
             // 如果标签List是空的，说明饭店没标签，是有问题的查询，需要返回null
-            if(restaurantLabels != null){
+            if(!restaurantLabels.isEmpty()){
                 // 这个sum的计算方法以后还要修改
                 int sum = 0;
                 RestaurantOverView restaurantOverView = new RestaurantOverView();
 
-                restaurantOverView.setRestaurantId(restaurantInfo.getRestaurantId());
                 restaurantOverView.setRestaurantName(restaurantInfo.getRestaurantName());
                 restaurantOverView.setRestaurantTag(restaurantInfo.getRestaurantTag());
                 restaurantOverView.setRestaurantPosition(restaurantInfo.getRestaurantPosition());

@@ -1,5 +1,7 @@
 package com.example.foodcommentadmin.service;
 
+import com.example.foodcommentadmin.pojo.FoodOverView;
+import com.example.foodcommentadmin.pojo.LabelOverView;
 import com.example.foodcommentadmin.pojo.RestaurantOverView;
 
 import java.util.List;
@@ -11,8 +13,17 @@ import java.util.List;
  **/
 public interface RestaurantOverViewService {
 
+    // 全部餐厅，用于返回给管理员
+    List<RestaurantOverView> totalRestaurantOverView();
+
+    // 全部招牌菜，用于返回给管理员
+    List<FoodOverView> totalFoodOverView();
+
+    // 全部标签，用于返回给管理员
+    List<LabelOverView> totalLabelOverView();
+
     // 市为范围，点赞总数降序
-    List<RestaurantOverView> totalRestaurantOverView(String city);
+    List<RestaurantOverView> cityRestaurantOverView(String city);
 
     // 饭店名搜索
     // 需要用户手动输入进行搜索

@@ -3,6 +3,8 @@ package com.example.foodcommentadmin.controller;
 import com.alibaba.fastjson.JSON;
 import com.example.foodcommentadmin.common.R;
 import com.example.foodcommentadmin.enums.ResultCode;
+import com.example.foodcommentadmin.pojo.FoodOverView;
+import com.example.foodcommentadmin.pojo.LabelOverView;
 import com.example.foodcommentadmin.pojo.RestaurantOverView;
 import com.example.foodcommentadmin.service.RestaurantOverViewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +26,40 @@ public class RestaurantOverViewController {
     @Autowired
     private RestaurantOverViewService restaurantOverViewService;
 
-    @PostMapping("/GetTotal")
-    public R getTotalRestaurantOverView(@Validated @RequestBody String JsonCity){
+    // 给管理员用的接口
+    @GetMapping("/GetTotalRestaurantOverView")
+    public R getTotalRestaurantOverView(){
+        List<RestaurantOverView> restaurantOverViewList = restaurantOverViewService
+                .totalRestaurantOverView();
+        if(restaurantOverViewList != null){
+            return R.ok().data(restaurantOverViewList);
+        }
+        return R.setResult(ResultCode.EMPTY_SET);
+    }
+
+    @GetMapping("/GetTotalFoodOverView")
+    public R getTotalFoodOverView(){
+        List<FoodOverView> foodOverViewList = restaurantOverViewService.totalFoodOverView();
+        if(foodOverViewList != null){
+            return R.ok().data(foodOverViewList);
+        }
+        return R.setResult(ResultCode.EMPTY_SET);
+    }
+
+    @GetMapping("/GetTotalLabelOverView")
+    public R getTotalLabelOverView(){
+        List<LabelOverView> labelOverViewList = restaurantOverViewService.totalLabelOverView();
+        if(labelOverViewList != null){
+            return R.ok().data(labelOverViewList);
+        }
+        return R.setResult(ResultCode.EMPTY_SET);
+    }
+
+    @PostMapping("/GetCity")
+    public R getCityRestaurantOverView(@Validated @RequestBody String JsonCity){
         String city = JSON.parseObject(JsonCity).get("city").toString();
         List<RestaurantOverView> restaurantOverViewList = restaurantOverViewService
-                .totalRestaurantOverView(city);
+                .cityRestaurantOverView(city);
         if(restaurantOverViewList != null){
             return R.ok().data(restaurantOverViewList);
         }

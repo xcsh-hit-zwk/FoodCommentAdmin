@@ -8,4 +8,5 @@ public class Account extends Model<Account> {
 
     private String username;
     private String password;
+
 }
