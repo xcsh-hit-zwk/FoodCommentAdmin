@@ -258,4 +258,54 @@ public class AdminInfoServiceImpl implements AdminInfoService {
             return false;
         }
     }
+
+    @Override
+    public String getUpdateRestaurantId(RestaurantOverView restaurantOverView) {
+
+        QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
+        restaurantInfoQueryWrapper.eq("has_delete", false)
+                .eq("restaurant_name", restaurantOverView.getRestaurantName())
+                .eq("restaurant_tag", restaurantOverView.getRestaurantTag())
+                .eq("restaurant_position", restaurantOverView.getRestaurantPosition())
+                .eq("restaurant_image", restaurantOverView.getRestaurantImage())
+                .eq("restaurant_province", restaurantOverView.getRestaurantProvince())
+                .eq("restaurant_city", restaurantOverView.getRestaurantCity())
+                .eq("restaurant_block", restaurantOverView.getRestaurantBlock());
+
+        RestaurantInfo get = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
+        if(get == null){
+            return null;
+        }
+        return get.getRestaurantId();
+    }
+
+    @Override
+    public Boolean updateRestaurant(String restaurantId, RestaurantOverView restaurantOverView) {
+
+        QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
+        restaurantInfoQueryWrapper.eq("restaurant_id", restaurantId)
+                .eq("has_delete", false);
+        RestaurantInfo restaurantInfo = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
+
+        if(restaurantInfo == null){
+            return false;
+        }
+
+        restaurantInfo.setModTime(new Date());
+        restaurantInfo.setRestaurantName(restaurantOverView.getRestaurantName());
+        restaurantInfo.setRestaurantTag(restaurantOverView.getRestaurantTag());
+        restaurantInfo.setRestaurantPosition(restaurantOverView.getRestaurantPosition());
+        restaurantInfo.setRestaurantImage(restaurantOverView.getRestaurantImage());
+        restaurantInfo.setRestaurantProvince(restaurantOverView.getRestaurantProvince());
+        restaurantInfo.setRestaurantCity(restaurantOverView.getRestaurantCity());
+        restaurantInfo.setRestaurantBlock(restaurantOverView.getRestaurantBlock());
+
+        int result = restaurantInfoMapper.update(restaurantInfo, restaurantInfoQueryWrapper);
+        if(result == 1){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }

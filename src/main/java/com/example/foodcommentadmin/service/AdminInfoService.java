@@ -26,4 +26,9 @@ public interface AdminInfoService {
 
     // 管理员删除餐厅
     Boolean deleteRestaurant(RestaurantOverView restaurantOverView);
+
+    // 获取需要更新的餐厅的Id
+    String getUpdateRestaurantId(RestaurantOverView restaurantOverView);
+    // 管理员更新餐厅
+    Boolean updateRestaurant(String restaurantId, RestaurantOverView restaurantOverView);
 }

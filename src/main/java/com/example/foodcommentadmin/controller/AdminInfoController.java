@@ -5,6 +5,7 @@ import com.example.foodcommentadmin.enums.ResultCode;
 import com.example.foodcommentadmin.pojo.FoodOverView;
 import com.example.foodcommentadmin.pojo.LabelOverView;
 import com.example.foodcommentadmin.pojo.RestaurantOverView;
+import com.example.foodcommentadmin.pojo.UpdateRestaurantOverView;
 import com.example.foodcommentadmin.service.AdminInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -69,6 +70,27 @@ public class AdminInfoController {
             return R.ok();
         }
         return R.setResult(ResultCode.SOME_DELETE_FAILED);
+    }
+
+    @PostMapping("/GetUpdateRestaurantId")
+    public R getUpdateRestaurantId(@Validated @RequestBody RestaurantOverView restaurantOverView){
+        String restaurantId = adminInfoService.getUpdateRestaurantId(restaurantOverView);
+        if(restaurantId != null){
+            return R.ok().data(restaurantId);
+        }
+        return R.setResult(ResultCode.EMPTY_SET);
+    }
+
+    @PostMapping("/UpdateRestaurant")
+    public R updateRestaurant(@Validated @RequestBody UpdateRestaurantOverView updateRestaurantOverView){
+        Boolean success = adminInfoService
+                .updateRestaurant(updateRestaurantOverView.getRestaurantId(), updateRestaurantOverView.getRestaurantOverView());
+        if(success == true){
+            return R.ok();
+        }
+        else {
+            return R.setResult(ResultCode.SOME_UPDATE_FAILED);
+        }
     }
 
 }
