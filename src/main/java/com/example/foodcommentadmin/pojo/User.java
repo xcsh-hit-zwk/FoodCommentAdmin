@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 @TableName("user")
 public class User extends Model<User> {
@@ -16,10 +18,10 @@ public class User extends Model<User> {
     private String nickname;
 
     @TableField(fill = FieldFill.INSERT)
-    private String createTime;
+    private Date createTime;
 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String modTime;
+    @TableField(fill = FieldFill.INSERT)
+    private Date modTime;
 
     @TableField(fill = FieldFill.INSERT)
     private Boolean hasDelete;

@@ -22,7 +22,7 @@ public class AdminEntity extends Model<AdminEntity> {
     @TableField(fill = FieldFill.INSERT)
     private String createTime;
 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT)
     private String modTime;
 
     @TableField(fill = FieldFill.INSERT)

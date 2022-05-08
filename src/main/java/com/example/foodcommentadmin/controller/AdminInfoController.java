@@ -7,10 +7,8 @@ import com.example.foodcommentadmin.pojo.LabelOverView;
 import com.example.foodcommentadmin.pojo.RestaurantOverView;
 import com.example.foodcommentadmin.service.AdminInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -54,4 +52,23 @@ public class AdminInfoController {
         }
         return R.setResult(ResultCode.EMPTY_SET);
     }
+
+    @PostMapping("/AddRestaurant")
+    public R addRestaurant(@Validated @RequestBody RestaurantOverView restaurantOverView){
+        Boolean success = adminInfoService.addRestaurant(restaurantOverView);
+        if(success == true){
+            return R.ok();
+        }
+        return R.setResult(ResultCode.SOME_INSERT_FAILED);
+    }
+
+    @PostMapping("/DeleteRestaurant")
+    public R deleteRestaurant(@Validated @RequestBody RestaurantOverView restaurantOverView){
+        Boolean success = adminInfoService.deleteRestaurant(restaurantOverView);
+        if(success == true){
+            return R.ok();
+        }
+        return R.setResult(ResultCode.SOME_DELETE_FAILED);
+    }
+
 }

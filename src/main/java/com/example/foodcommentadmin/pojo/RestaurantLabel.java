@@ -3,6 +3,8 @@ package com.example.foodcommentadmin.pojo;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @description: MySql中RestaurantLabel表对应的实体类
  * @author: zhangweikun
@@ -20,10 +22,10 @@ public class RestaurantLabel {
     private String labelInfo;
 
     @TableField(fill = FieldFill.INSERT)
-    private String createTime;
+    private Date createTime;
 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String modTime;
+    @TableField(fill = FieldFill.INSERT)
+    private Date modTime;
 
     @TableField(fill = FieldFill.INSERT)
     private Boolean hasDelete;

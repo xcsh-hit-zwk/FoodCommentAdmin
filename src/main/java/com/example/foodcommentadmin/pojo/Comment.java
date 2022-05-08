@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.sun.org.apache.xpath.internal.operations.Mod;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @description: MySql中Comment表对应的实体类
  * @author: zhangweikun
@@ -28,9 +30,9 @@ public class Comment extends Model<Comment> {
     private Boolean hasDelete;
 
     @TableField(fill = FieldFill.INSERT)
-    private String createTime;
+    private Date createTime;
 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String modTime;
+    @TableField(fill = FieldFill.INSERT)
+    private Date modTime;
 
 }

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -144,6 +145,7 @@ public class AdminInfoServiceImpl implements AdminInfoService {
         List<LabelOverView> labelOverViewList = new ArrayList<>();
 
         QueryWrapper<RestaurantLabel> restaurantLabelQueryWrapper = new QueryWrapper<>();
+        restaurantLabelQueryWrapper.eq("has_delete", false);
         List<RestaurantLabel> restaurantLabelList = restaurantLabelMapper
                 .selectList(restaurantLabelQueryWrapper);
         if(restaurantLabelList.isEmpty()){
@@ -167,5 +169,93 @@ public class AdminInfoServiceImpl implements AdminInfoService {
         }
 
         return labelOverViewList;
+    }
+
+    @Override
+    public Boolean addRestaurant(RestaurantOverView restaurantOverView) {
+        RestaurantInfo restaurantInfo = new RestaurantInfo();
+
+        restaurantInfo.setRestaurantName(restaurantOverView.getRestaurantName());
+        restaurantInfo.setRestaurantTag(restaurantOverView.getRestaurantTag());
+        restaurantInfo.setRestaurantPosition(restaurantOverView.getRestaurantPosition());
+        restaurantInfo.setRestaurantImage(restaurantOverView.getRestaurantImage());
+        restaurantInfo.setRestaurantProvince(restaurantOverView.getRestaurantProvince());
+        restaurantInfo.setRestaurantCity(restaurantOverView.getRestaurantCity());
+        restaurantInfo.setRestaurantBlock(restaurantOverView.getRestaurantBlock());
+
+        QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
+        restaurantInfoQueryWrapper.eq("restaurant_name", restaurantInfo.getRestaurantName())
+                .eq("has_delete", false);
+        RestaurantInfo check = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
+        if(check != null){
+            return false;
+        }
+
+        int result = restaurantInfoMapper.insert(restaurantInfo);
+        if(result == 1){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    @Override
+    public Boolean deleteRestaurant(RestaurantOverView restaurantOverView) {
+
+
+        QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
+        restaurantInfoQueryWrapper.eq("has_delete", false)
+                .eq("restaurant_name", restaurantOverView.getRestaurantName())
+                .eq("restaurant_tag", restaurantOverView.getRestaurantTag())
+                .eq("restaurant_position", restaurantOverView.getRestaurantPosition())
+                .eq("restaurant_image", restaurantOverView.getRestaurantImage())
+                .eq("restaurant_province", restaurantOverView.getRestaurantProvince())
+                .eq("restaurant_city", restaurantOverView.getRestaurantCity())
+                .eq("restaurant_block", restaurantOverView.getRestaurantBlock());
+
+        RestaurantInfo delete = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
+        if(delete != null){
+
+            delete.setHasDelete(true);
+            delete.setModTime(new Date());
+            restaurantInfoMapper.update(delete, restaurantInfoQueryWrapper);
+            String restaurantId = delete.getRestaurantId();
+
+            QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+            foodQueryWrapper.eq("restaurant_id", restaurantId)
+                    .eq("has_delete", false);
+            List<Food> foodList = foodMapper.selectList(foodQueryWrapper);
+            Iterator<Food> foodIterator = foodList.iterator();
+            while (foodIterator.hasNext()){
+                Food food = foodIterator.next();
+                food.setHasDelete(true);
+                food.setModTime(new Date());
+                QueryWrapper<Food> deleteQueryWrapper = new QueryWrapper<>();
+                deleteQueryWrapper.eq("food_id", food.getFoodId())
+                                .eq("has_delete", false);
+                foodMapper.update(food, deleteQueryWrapper);
+            }
+
+            QueryWrapper<RestaurantLabel> restaurantLabelQueryWrapper = new QueryWrapper<>();
+            restaurantLabelQueryWrapper.eq("restaurant_id", restaurantId)
+                    .eq("has_delete", false);
+            List<RestaurantLabel> restaurantLabelList = restaurantLabelMapper
+                    .selectList(restaurantLabelQueryWrapper);
+            Iterator<RestaurantLabel> restaurantLabelIterator = restaurantLabelList.iterator();
+            while (restaurantLabelIterator.hasNext()){
+                RestaurantLabel restaurantLabel = restaurantLabelIterator.next();
+                restaurantLabel.setHasDelete(true);
+                restaurantLabel.setModTime(new Date());
+                QueryWrapper<RestaurantLabel> deleteQueryWrapper = new QueryWrapper<>();
+                deleteQueryWrapper.eq("label_id", restaurantLabel.getLabelId())
+                        .eq("has_delete", false);
+                restaurantLabelMapper.update(restaurantLabel, deleteQueryWrapper);
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

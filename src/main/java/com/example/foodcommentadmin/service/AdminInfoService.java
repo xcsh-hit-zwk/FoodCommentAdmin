@@ -21,4 +21,9 @@ public interface AdminInfoService {
     // 全部标签，用于返回给管理员
     List<LabelOverView> totalLabelOverView();
 
+    // 管理员添加餐厅
+    Boolean addRestaurant(RestaurantOverView restaurantOverView);
+
+    // 管理员删除餐厅
+    Boolean deleteRestaurant(RestaurantOverView restaurantOverView);
 }
