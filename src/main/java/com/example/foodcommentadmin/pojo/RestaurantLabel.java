@@ -18,7 +18,6 @@ public class RestaurantLabel {
     private String labelId;
 
     private String restaurantId;
-    private Integer labelLike;
     private String labelInfo;
 
     @TableField(fill = FieldFill.INSERT)

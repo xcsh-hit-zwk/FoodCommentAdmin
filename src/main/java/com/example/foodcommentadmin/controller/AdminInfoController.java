@@ -93,6 +93,26 @@ public class AdminInfoController {
         }
     }
 
+    @PostMapping("/AddFood")
+    public R addFood(@Validated @RequestBody FoodOverView foodOverView){
+        Boolean success = adminInfoService.addFood(foodOverView);
+        if(success == true){
+            return R.ok();
+        }
+        return R.setResult(ResultCode.SOME_INSERT_FAILED);
+    }
+
+    @PostMapping("/DeleteFood")
+    public R deleteFood(@Validated @RequestBody FoodOverView foodOverView){
+        Boolean success = adminInfoService.deleteFood(foodOverView);
+        if(success == true){
+            return R.ok();
+        }
+        else {
+            return R.setResult(ResultCode.SOME_DELETE_FAILED);
+        }
+    }
+
     @PostMapping("/GetUpdateFoodId")
     public R getUpdateFoodId(@Validated @RequestBody FoodOverView foodOverView){
         String foodId = adminInfoService.getUpdateFoodId(foodOverView);
@@ -113,5 +133,39 @@ public class AdminInfoController {
         return R.setResult(ResultCode.SOME_UPDATE_FAILED);
     }
 
+    @PostMapping("/AddLabel")
+    public R addLabel(@Validated @RequestBody LabelOverView labelOverView){
+        Boolean success = adminInfoService.addLabel(labelOverView);
+        if(success == true){
+            return R.ok();
+        }
+        return R.setResult(ResultCode.SOME_INSERT_FAILED);
+    }
 
+    @PostMapping("/DeleteLabel")
+    public R deleteLabel(@Validated @RequestBody LabelOverView labelOverView){
+        Boolean success = adminInfoService.deleteLabel(labelOverView);
+        if(success == true){
+            return R.ok();
+        }
+        return R.setResult(ResultCode.SOME_DELETE_FAILED);
+    }
+
+    @PostMapping("/GetUpdateLabelId")
+    public R getUpdateLabelId(@Validated @RequestBody LabelOverView labelOverView){
+        String labelId = adminInfoService.getUpdateLabelId(labelOverView);
+        if (labelId != null){
+            return R.ok().data(labelId);
+        }
+        return R.setResult(ResultCode.EMPTY_SET);
+    }
+
+    @PostMapping("/UpdateLabel")
+    public R updateLabel(@Validated @RequestBody UpdateLabelOverView updateLabelOverView){
+        Boolean success = adminInfoService.updateLabel(updateLabelOverView.getLabelId(), updateLabelOverView.getLabelOverView());
+        if(success == true){
+            return R.ok();
+        }
+        return R.setResult(ResultCode.SOME_UPDATE_FAILED);
+    }
 }

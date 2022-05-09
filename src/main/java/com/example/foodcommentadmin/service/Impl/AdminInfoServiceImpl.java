@@ -64,36 +64,26 @@ public class AdminInfoServiceImpl implements AdminInfoService {
 
             // 填充点赞数
             QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
-            QueryWrapper<RestaurantLabel> restaurantLabelQueryWrapper = new QueryWrapper<>();
 
             String restaurantId = restaurantInfo.getRestaurantId();
             foodQueryWrapper.eq("restaurant_id", restaurantId)
                     .eq("has_delete", false);
-            restaurantLabelQueryWrapper.eq("restaurant_id", restaurantId)
-                    .eq("has_delete", false);
 
             List<Food> foodList = new ArrayList<>();
-            List<RestaurantLabel> restaurantLabelList = new ArrayList<>();
 
             foodList = foodMapper.selectList(foodQueryWrapper);
-            restaurantLabelList = restaurantLabelMapper.selectList(restaurantLabelQueryWrapper);
 
             // 添加点赞数
             int likes = 0;
-            if(!foodList.isEmpty() && !restaurantLabelList.isEmpty()){
+            if(!foodList.isEmpty()){
 
                 Iterator<Food> foodIterator = foodList.iterator();
-                Iterator<RestaurantLabel> restaurantLabelIterator = restaurantLabelList.iterator();
 
                 while (foodIterator.hasNext()){
                     Food food = foodIterator.next();
                     likes += food.getFoodLike();
                 }
 
-                while (restaurantLabelIterator.hasNext()){
-                    RestaurantLabel restaurantLabel = restaurantLabelIterator.next();
-                    likes += restaurantLabel.getLabelLike();
-                }
             }
             restaurantOverView.setLikes(likes);
 
@@ -123,7 +113,7 @@ public class AdminInfoServiceImpl implements AdminInfoService {
             FoodOverView foodOverView = new FoodOverView();
 
             String temp = food.getFoodName();
-            String foodName = temp.substring(temp.indexOf("-")+1, temp.length());
+            String foodName = temp.substring(temp.indexOf("-") + 1);
             foodOverView.setFoodName(foodName);
             foodOverView.setFoodLikes(food.getFoodLike());
             foodOverView.setFoodImage(food.getFoodPicture());
@@ -158,7 +148,10 @@ public class AdminInfoServiceImpl implements AdminInfoService {
         while (restaurantLabelIterator.hasNext()){
             RestaurantLabel restaurantLabel = restaurantLabelIterator.next();
             LabelOverView labelOverView = new LabelOverView();
-            labelOverView.setLabelName(restaurantLabel.getLabelInfo());
+
+            String temp = restaurantLabel.getLabelInfo();
+            String labelName = temp.substring(temp.indexOf("-") + 1);
+            labelOverView.setLabelName(labelName);
 
             QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
             restaurantInfoQueryWrapper.eq("restaurant_id", restaurantLabel.getRestaurantId());
@@ -307,12 +300,58 @@ public class AdminInfoServiceImpl implements AdminInfoService {
 
     @Override
     public Boolean addFood(FoodOverView foodOverView) {
-        return null;
+
+        QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+        foodQueryWrapper.eq("has_delete", false)
+                .eq("food_name", foodOverView.getRestaurantName() + "-" + foodOverView.getFoodName());
+        Food food = foodMapper.selectOne(foodQueryWrapper);
+        if(food != null){
+            return false;
+        }
+
+        QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
+        restaurantInfoQueryWrapper.eq("has_delete", false)
+                .eq("restaurant_name", foodOverView.getRestaurantName());
+        RestaurantInfo restaurantInfo = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
+        if(restaurantInfo == null){
+            return false;
+        }
+
+        String restaurantId = restaurantInfo.getRestaurantId();
+        Food insert = new Food();
+        insert.setFoodName(foodOverView.getRestaurantName() + "-" + foodOverView.getFoodName());
+        insert.setRestaurantId(restaurantId);
+        insert.setFoodPicture(foodOverView.getFoodImage());
+        insert.setFoodLike(foodOverView.getFoodLikes());
+
+        int result = foodMapper.insert(insert);
+        if(result == 1){
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     @Override
     public Boolean deleteFood(FoodOverView foodOverView) {
-        return null;
+        QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+        foodQueryWrapper.eq("has_delete", false)
+                .eq("food_name", foodOverView.getRestaurantName() + "-" + foodOverView.getFoodName());
+        Food food = foodMapper.selectOne(foodQueryWrapper);
+        if(food == null){
+            return false;
+        }
+
+        food.setModTime(new Date());
+        food.setHasDelete(true);
+        int result = foodMapper.update(food, foodQueryWrapper);
+        if(result == 1){
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     @Override
@@ -353,6 +392,95 @@ public class AdminInfoServiceImpl implements AdminInfoService {
         log.info("开始更新");
         int result = foodMapper.update(food, foodQueryWrapper);
         if (result == 1){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    @Override
+    public Boolean addLabel(LabelOverView labelOverView) {
+
+        QueryWrapper<RestaurantLabel> restaurantLabelQueryWrapper = new QueryWrapper<>();
+        restaurantLabelQueryWrapper.eq("has_delete", false)
+                .eq("label_info", labelOverView.getLabelName());
+        RestaurantLabel restaurantLabel = restaurantLabelMapper.selectOne(restaurantLabelQueryWrapper);
+        if(restaurantLabel != null){
+            log.info("标签重复");
+            return false;
+        }
+
+        QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
+        restaurantInfoQueryWrapper.eq("has_delete", false)
+                .eq("restaurant_name", labelOverView.getRestaurantName());
+        RestaurantInfo restaurantInfo = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
+        if(restaurantInfo == null){
+            log.info("没找到对应餐厅");
+            return false;
+        }
+
+        String restaurantId = restaurantInfo.getRestaurantId();
+        RestaurantLabel insert = new RestaurantLabel();
+        insert.setLabelInfo(labelOverView.getRestaurantName() + "-" + labelOverView.getLabelName());
+        insert.setRestaurantId(restaurantId);
+        int result = restaurantLabelMapper.insert(insert);
+        if(result == 1){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    @Override
+    public Boolean deleteLabel(LabelOverView labelOverView) {
+        QueryWrapper<RestaurantLabel> restaurantLabelQueryWrapper = new QueryWrapper<>();
+        restaurantLabelQueryWrapper.eq("has_delete", false)
+                .eq("label_info", labelOverView.getRestaurantName() + "-" + labelOverView.getLabelName());
+        RestaurantLabel restaurantLabel = restaurantLabelMapper.selectOne(restaurantLabelQueryWrapper);
+        if(restaurantLabel == null){
+            return false;
+        }
+
+        restaurantLabel.setHasDelete(true);
+        int result = restaurantLabelMapper.update(restaurantLabel, restaurantLabelQueryWrapper);
+        if(result == 1){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    @Override
+    public String getUpdateLabelId(LabelOverView labelOverView) {
+        QueryWrapper<RestaurantLabel> restaurantLabelQueryWrapper = new QueryWrapper<>();
+        restaurantLabelQueryWrapper.eq("has_delete", false)
+                .eq("label_info", labelOverView.getRestaurantName() + "-" + labelOverView.getLabelName());
+        RestaurantLabel restaurantLabel = restaurantLabelMapper.selectOne(restaurantLabelQueryWrapper);
+        if (restaurantLabel == null){
+            return null;
+        }
+
+        return restaurantLabel.getLabelId();
+    }
+
+    @Override
+    public Boolean updateLabel(String labelId, LabelOverView labelOverView) {
+        QueryWrapper<RestaurantLabel> restaurantLabelQueryWrapper = new QueryWrapper<>();
+        restaurantLabelQueryWrapper.eq("has_delete", false)
+                .eq("label_id", labelId);
+        RestaurantLabel restaurantLabel = restaurantLabelMapper.selectOne(restaurantLabelQueryWrapper);
+        if(restaurantLabel == null){
+            return false;
+        }
+
+        restaurantLabel.setLabelInfo(labelOverView.getRestaurantName() + "-" + labelOverView.getLabelName());
+        restaurantLabel.setModTime(new Date());
+
+        int result = restaurantLabelMapper.update(restaurantLabel, restaurantLabelQueryWrapper);
+        if(result == 1){
             return true;
         }
         else {

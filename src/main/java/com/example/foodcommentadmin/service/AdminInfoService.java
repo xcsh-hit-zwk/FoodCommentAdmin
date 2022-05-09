@@ -43,6 +43,15 @@ public interface AdminInfoService {
     // 管理员更新招牌菜
     Boolean updateFood(String foodId, FoodOverView foodOverView);
 
+    // 管理员添加标签
+    Boolean addLabel(LabelOverView labelOverView);
 
+    // 管理员删除标签
+    Boolean deleteLabel(LabelOverView labelOverView);
+
+    // 管理员获取需要更新的标签的Id
+    String getUpdateLabelId(LabelOverView labelOverView);
+    // 管理员更新标签
+    Boolean updateLabel(String labelId, LabelOverView labelOverView);
 
 }
