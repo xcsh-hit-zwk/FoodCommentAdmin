@@ -1,12 +1,11 @@
 package com.example.foodcommentadmin.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.example.foodcommentadmin.common.R;
 import com.example.foodcommentadmin.enums.ResultCode;
-import com.example.foodcommentadmin.pojo.FoodOverView;
-import com.example.foodcommentadmin.pojo.LabelOverView;
-import com.example.foodcommentadmin.pojo.RestaurantOverView;
-import com.example.foodcommentadmin.pojo.UpdateRestaurantOverView;
+import com.example.foodcommentadmin.pojo.*;
 import com.example.foodcommentadmin.service.AdminInfoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +19,7 @@ import java.util.List;
 @RestController
 @CrossOrigin
 @RequestMapping("/AdminInfo")
+@Slf4j
 public class AdminInfoController {
 
     @Autowired
@@ -92,5 +92,26 @@ public class AdminInfoController {
             return R.setResult(ResultCode.SOME_UPDATE_FAILED);
         }
     }
+
+    @PostMapping("/GetUpdateFoodId")
+    public R getUpdateFoodId(@Validated @RequestBody FoodOverView foodOverView){
+        String foodId = adminInfoService.getUpdateFoodId(foodOverView);
+        if(foodId != null){
+            return R.ok().data(foodId);
+        }
+        return R.setResult(ResultCode.EMPTY_SET);
+    }
+
+    @PostMapping("/UpdateFood")
+    public R updateFood(@Validated @RequestBody UpdateFoodOverView updateFoodOverView){
+        log.info("接收报文:", updateFoodOverView);
+        Boolean success = adminInfoService.updateFood(updateFoodOverView.getFoodId(),
+                updateFoodOverView.getFoodOverView());
+        if(success == true){
+            return R.ok();
+        }
+        return R.setResult(ResultCode.SOME_UPDATE_FAILED);
+    }
+
 
 }

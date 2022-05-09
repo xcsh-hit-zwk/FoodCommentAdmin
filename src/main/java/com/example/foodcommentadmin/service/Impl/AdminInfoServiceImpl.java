@@ -122,7 +122,9 @@ public class AdminInfoServiceImpl implements AdminInfoService {
             Food food = foodIterator.next();
             FoodOverView foodOverView = new FoodOverView();
 
-            foodOverView.setFoodName(food.getFoodName());
+            String temp = food.getFoodName();
+            String foodName = temp.substring(temp.indexOf("-")+1, temp.length());
+            foodOverView.setFoodName(foodName);
             foodOverView.setFoodLikes(food.getFoodLike());
             foodOverView.setFoodImage(food.getFoodPicture());
 
@@ -264,13 +266,7 @@ public class AdminInfoServiceImpl implements AdminInfoService {
 
         QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
         restaurantInfoQueryWrapper.eq("has_delete", false)
-                .eq("restaurant_name", restaurantOverView.getRestaurantName())
-                .eq("restaurant_tag", restaurantOverView.getRestaurantTag())
-                .eq("restaurant_position", restaurantOverView.getRestaurantPosition())
-                .eq("restaurant_image", restaurantOverView.getRestaurantImage())
-                .eq("restaurant_province", restaurantOverView.getRestaurantProvince())
-                .eq("restaurant_city", restaurantOverView.getRestaurantCity())
-                .eq("restaurant_block", restaurantOverView.getRestaurantBlock());
+                .eq("restaurant_name", restaurantOverView.getRestaurantName());
 
         RestaurantInfo get = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
         if(get == null){
@@ -302,6 +298,61 @@ public class AdminInfoServiceImpl implements AdminInfoService {
 
         int result = restaurantInfoMapper.update(restaurantInfo, restaurantInfoQueryWrapper);
         if(result == 1){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    @Override
+    public Boolean addFood(FoodOverView foodOverView) {
+        return null;
+    }
+
+    @Override
+    public Boolean deleteFood(FoodOverView foodOverView) {
+        return null;
+    }
+
+    @Override
+    public String getUpdateFoodId(FoodOverView foodOverView) {
+
+        Food get = new Food();
+        QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+        foodQueryWrapper.eq("has_delete", false)
+                .eq("food_name", foodOverView.getRestaurantName()
+                        + "-" + foodOverView.getFoodName());
+        get = foodMapper.selectOne(foodQueryWrapper);
+
+        if(get == null){
+            return null;
+        }
+
+        return get.getFoodId();
+    }
+
+    @Override
+    public Boolean updateFood(String foodId, FoodOverView foodOverView) {
+
+        QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+        foodQueryWrapper.eq("has_delete", false)
+                .eq("food_id", foodId);
+        log.info("food_id : " + foodId);
+        Food food = foodMapper.selectOne(foodQueryWrapper);
+        if(food == null){
+            log.info("没查到更新");
+            return false;
+        }
+
+        food.setModTime(new Date());
+        food.setFoodName(foodOverView.getRestaurantName() + "-" + foodOverView.getFoodName());
+        food.setFoodLike(foodOverView.getFoodLikes());
+        food.setFoodPicture(foodOverView.getFoodImage());
+
+        log.info("开始更新");
+        int result = foodMapper.update(food, foodQueryWrapper);
+        if (result == 1){
             return true;
         }
         else {

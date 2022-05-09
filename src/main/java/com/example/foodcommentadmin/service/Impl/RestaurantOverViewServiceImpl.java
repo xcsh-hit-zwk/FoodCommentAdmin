@@ -34,7 +34,7 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
     private FoodMapper foodMapper;
 
 
-
+    // todo 跟用户端有关的返回接口全都要改，包括FoodName字段的修正问题
     @Override
     public List<RestaurantOverView> cityRestaurantOverView(String city) {
 

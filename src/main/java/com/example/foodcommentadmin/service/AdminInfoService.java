@@ -31,4 +31,18 @@ public interface AdminInfoService {
     String getUpdateRestaurantId(RestaurantOverView restaurantOverView);
     // 管理员更新餐厅
     Boolean updateRestaurant(String restaurantId, RestaurantOverView restaurantOverView);
+
+    // 管理员添加招牌菜
+    Boolean addFood(FoodOverView foodOverView);
+
+    // 管理员删除招牌菜
+    Boolean deleteFood(FoodOverView foodOverView);
+
+    // 管理员获取需要更新招牌菜的id
+    String getUpdateFoodId(FoodOverView foodOverView);
+    // 管理员更新招牌菜
+    Boolean updateFood(String foodId, FoodOverView foodOverView);
+
+
+
 }

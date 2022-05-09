@@ -28,9 +28,9 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         log.info("start Time Stamp insert fill......");
-        this.setFieldValByName("createTime", simpleDateFormat.format(date), metaObject);
-        this.setFieldValByName("modTime", simpleDateFormat.format(date), metaObject);
-        this.setFieldValByName("commentTime", simpleDateFormat.format(date), metaObject);
+        this.setFieldValByName("createTime", new Date(), metaObject);
+        this.setFieldValByName("modTime", new Date(), metaObject);
+        this.setFieldValByName("commentTime", new Date(), metaObject);
 
         log.info("start default value insert fill......");
         this.setFieldValByName("hasDelete", false, metaObject);
@@ -38,7 +38,6 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-
     }
 
 
