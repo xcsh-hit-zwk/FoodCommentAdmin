@@ -34,26 +34,63 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
     private FoodMapper foodMapper;
 
 
-    // todo 跟用户端有关的返回接口全都要改，包括FoodName字段的修正问题
     @Override
     public List<RestaurantOverView> cityRestaurantOverView(String city) {
 
         List<RestaurantOverView> restaurantOverViewList = new ArrayList<>();
 
+        log.info(city);
+        log.info("威海");
         // 查饭店信息
         QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
         restaurantInfoQueryWrapper.like("restaurant_city", city)
                 .eq("has_delete", false);
-        List<RestaurantInfo> restaurantInfos = restaurantInfoMapper
+        List<RestaurantInfo> restaurantInfoList = restaurantInfoMapper
                 .selectList(restaurantInfoQueryWrapper);
 
-        if(restaurantInfos.isEmpty()){
+        if(restaurantInfoList.isEmpty()){
+            log.info("查询餐厅失败");
             return null;
+        }
+
+        Iterator<RestaurantInfo> restaurantInfoIterator = restaurantInfoList.iterator();
+        while (restaurantInfoIterator.hasNext()){
+
+            RestaurantInfo restaurantInfo = restaurantInfoIterator.next();
+            RestaurantOverView restaurantOverView = new RestaurantOverView();
+
+            restaurantOverView.setRestaurantName(restaurantInfo.getRestaurantName());
+            restaurantOverView.setRestaurantTag(restaurantInfo.getRestaurantTag());
+            restaurantOverView.setRestaurantImage(restaurantInfo.getRestaurantImage());
+            restaurantOverView.setRestaurantPosition(restaurantInfo.getRestaurantPosition());
+            restaurantOverView.setRestaurantProvince(restaurantInfo.getRestaurantProvince());
+            restaurantOverView.setRestaurantCity(restaurantInfo.getRestaurantCity());
+            restaurantOverView.setRestaurantBlock(restaurantInfo.getRestaurantBlock());
+
+            QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+            foodQueryWrapper.eq("has_delete", false)
+                    .eq("restaurant_id", restaurantInfo.getRestaurantId());
+            List<Food> foodList = foodMapper.selectList(foodQueryWrapper);
+
+            if(foodList.isEmpty()){
+                restaurantOverView.setLikes(0);
+            }
+
+            int likes = 0;
+            Iterator<Food> foodIterator = foodList.iterator();
+            while (foodIterator.hasNext()){
+                Food food = foodIterator.next();
+                likes += food.getFoodLike();
+            }
+            restaurantOverView.setLikes(likes);
+
+            restaurantOverViewList.add(restaurantOverView);
         }
 
         return restaurantOverViewList;
     }
 
+    // todo 以下接口全都要改，包括FoodName字段的修正问题
     @Override
     public List<RestaurantOverView> nameRestaurantOverView(String name) {
         List<RestaurantOverView> restaurantOverViewList = new ArrayList<>();

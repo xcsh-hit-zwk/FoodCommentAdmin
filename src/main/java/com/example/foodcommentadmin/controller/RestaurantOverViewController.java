@@ -7,6 +7,7 @@ import com.example.foodcommentadmin.pojo.FoodOverView;
 import com.example.foodcommentadmin.pojo.LabelOverView;
 import com.example.foodcommentadmin.pojo.RestaurantOverView;
 import com.example.foodcommentadmin.service.RestaurantOverViewService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,14 +22,15 @@ import java.util.List;
 @RestController
 @CrossOrigin
 @RequestMapping("/RestaurantOverView")
+@Slf4j
 public class RestaurantOverViewController {
 
     @Autowired
     private RestaurantOverViewService restaurantOverViewService;
 
     @PostMapping("/GetCity")
-    public R getCityRestaurantOverView(@Validated @RequestBody String JsonCity){
-        String city = JSON.parseObject(JsonCity).get("city").toString();
+    public R getCityRestaurantOverView(@Validated @RequestBody String jsonCity){
+        String city = JSON.parseObject(jsonCity).get("city").toString();
         List<RestaurantOverView> restaurantOverViewList = restaurantOverViewService
                 .cityRestaurantOverView(city);
         if(restaurantOverViewList != null){
