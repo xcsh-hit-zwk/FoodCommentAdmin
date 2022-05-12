@@ -16,6 +16,7 @@ public class User extends Model<User> {
     private String userId;
     private String password;
     private String nickname;
+    private String userImage;
 
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;

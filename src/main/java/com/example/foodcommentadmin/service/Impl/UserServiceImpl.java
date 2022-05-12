@@ -56,4 +56,18 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    @Override
+    public User getUser(Account account) {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("has_delete", false)
+                .eq("user_id", account.getUsername())
+                .eq("password", account.getPassword());
+        User user = userMapper.selectOne(userQueryWrapper);
+        if(user == null){
+            return null;
+        }
+
+        return user;
+    }
+
 }

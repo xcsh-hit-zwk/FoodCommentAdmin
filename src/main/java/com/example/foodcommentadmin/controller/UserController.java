@@ -41,4 +41,13 @@ public class UserController {
         }
         return R.setResult(ResultCode.USERNAME_EXISTS);
     }
+
+    @PostMapping("/getUser")
+    public R getUser(@Validated @RequestBody Account account){
+        User user = userService.getUser(account);
+        if (user != null){
+            return R.ok().data(user);
+        }
+        return R.setResult(ResultCode.USER_NOT_EXIST);
+    }
 }
