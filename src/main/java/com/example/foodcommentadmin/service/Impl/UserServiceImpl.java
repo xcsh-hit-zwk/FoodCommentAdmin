@@ -6,6 +6,7 @@ import com.example.foodcommentadmin.mapper.UserMapper;
 import com.example.foodcommentadmin.pojo.Account;
 import com.example.foodcommentadmin.pojo.RegisterAccount;
 import com.example.foodcommentadmin.pojo.User;
+import com.example.foodcommentadmin.pojo.UserInfo;
 import com.example.foodcommentadmin.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,4 +71,25 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    @Override
+    public Boolean updateUserInfo(UserInfo userInfo) {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("has_delete", false)
+                .eq("user_id", userInfo.getUsername())
+                .eq("password", userInfo.getPassword());
+        User user = userMapper.selectOne(userQueryWrapper);
+        if (user == null){
+            return false;
+        }
+        user.setNickname(userInfo.getNickname());
+        user.setUserImage(userInfo.getUserImage());
+
+        int result = userMapper.update(user, userQueryWrapper);
+        if(result == 1){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }
