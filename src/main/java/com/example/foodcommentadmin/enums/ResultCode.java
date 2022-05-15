@@ -21,6 +21,7 @@ public enum ResultCode {
     SOME_INSERT_FAILED(false, 30005, "部分数据插入异常！"),
     SOME_DELETE_FAILED(false, 30006, "部分数据删除异常"),
     SOME_UPDATE_FAILED(false, 30007, "部分数据删除异常"),
+    WRONG_SEARCH(false, 30008, "搜索出错"),
 
 
     FILE_NAME_ERROR(false, 40001, "获取文件名异常!"),

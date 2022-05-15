@@ -91,24 +91,6 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
     }
 
     // todo 以下接口全都要改，包括FoodName字段的修正问题
-    @Override
-    public List<RestaurantOverView> nameRestaurantOverView(String name) {
-        List<RestaurantOverView> restaurantOverViewList = new ArrayList<>();
-
-        // 查饭店信息
-        QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
-        restaurantInfoQueryWrapper.like("restaurant_name", name)
-                .eq("has_delete", false);
-        List<RestaurantInfo> restaurantInfos = restaurantInfoMapper
-                .selectList(restaurantInfoQueryWrapper);
-
-        if(restaurantInfos.isEmpty()){
-            return null;
-        }
-
-
-        return restaurantOverViewList;
-    }
 
     @Override
     public List<RestaurantOverView> tagRestaurantOverView(String tag) {

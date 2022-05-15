@@ -16,10 +16,6 @@ public interface RestaurantOverViewService {
     // 市为范围，点赞总数降序
     List<RestaurantOverView> cityRestaurantOverView(String city);
 
-    // 饭店名搜索
-    // 需要用户手动输入进行搜索
-    List<RestaurantOverView> nameRestaurantOverView(String name);
-
     // 饭店类型搜索
     // 需要用户手动输入进行搜索
     // 格式为：# + 饭店tag
