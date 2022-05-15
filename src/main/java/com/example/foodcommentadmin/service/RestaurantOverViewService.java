@@ -31,4 +31,6 @@ public interface RestaurantOverViewService {
     // 格式为：### + 区名
     List<RestaurantOverView> blockRestaurantOverView(String block);
 
+    List<RestaurantOverView> nameRestaurantOverView(String name);
+
 }

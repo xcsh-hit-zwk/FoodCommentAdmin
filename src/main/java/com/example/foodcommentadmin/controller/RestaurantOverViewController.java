@@ -47,6 +47,9 @@ public class RestaurantOverViewController {
             case "餐厅类型":
                 restaurantOverViewList = restaurantOverViewService.tagRestaurantOverView(searchInfo.getInfo());
                 break;
+            case "名称":
+                restaurantOverViewList = restaurantOverViewService.nameRestaurantOverView(searchInfo.getInfo());
+                break;
             default:
                 return R.setResult(ResultCode.WRONG_SEARCH);
         }
