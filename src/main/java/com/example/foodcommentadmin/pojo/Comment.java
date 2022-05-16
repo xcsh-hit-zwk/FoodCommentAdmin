@@ -20,6 +20,7 @@ public class Comment extends Model<Comment> {
     private String commentId;
 
     private String userId;
+    private String restaurantId;
     private String commentInfo;
 
     @TableField(fill = FieldFill.INSERT)
