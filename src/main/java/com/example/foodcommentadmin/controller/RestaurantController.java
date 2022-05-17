@@ -64,6 +64,26 @@ public class RestaurantController {
         return R.setResult(ResultCode.SOME_INSERT_FAILED);
     }
 
+    // 借用一下SearchInfo
+    // searchWay: "餐厅名", searchInfo: "招牌菜名"
+    @PostMapping("/CancelFoodLike")
+    public R cancelFoodLike(@Validated @RequestBody SearchInfo searchInfo){
+        String restaurantName = searchInfo.getSearchWay();
+        String foodName = searchInfo.getInfo();
+        if (restaurantName == null){
+            return R.setResult(ResultCode.WRONG_SEARCH);
+        }
+        if (foodName == null){
+            return R.setResult(ResultCode.WRONG_SEARCH);
+        }
+
+        Boolean answer = restaurantService.cancelFoodLike(restaurantName + "-" + foodName);
+        if(answer == true){
+            return R.ok();
+        }
+        return R.setResult(ResultCode.SOME_INSERT_FAILED);
+    }
+
 //    @PostMapping("/AddFood")
 //    public R addFood(@Validated @RequestBody List<RestaurantFoodEntity> restaurantFoods){
 //        String restaurantName = restaurantFoods.get(0).getRestaurantName();

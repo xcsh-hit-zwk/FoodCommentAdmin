@@ -20,5 +20,7 @@ public class RestaurantDetail {
     private List<FoodOverView> foodList;
     private List<String> labelList;
     private List<RestaurantComment> commentList;
+    // 只要6个
+    private List<RestaurantOverView> sameTagList;
 
 }

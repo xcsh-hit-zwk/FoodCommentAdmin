@@ -8,16 +8,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @description: 餐厅设置修改各种信息接口的实现类
  * @author: zhangweikun
  * @create: 2022-04-23 09:26
  **/
+// todo 同类型餐厅返回还没写，以及排序
+// todo 招牌菜排序还没写
 @Service
 @Slf4j
 public class RestaurantServiceImpl implements RestaurantService {
@@ -71,6 +70,25 @@ public class RestaurantServiceImpl implements RestaurantService {
         return false;
     }
 
+    @Override
+    public Boolean cancelFoodLike(String foodName) {
+        QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+        foodQueryWrapper.eq("has_delete", false)
+                .eq("food_name", foodName);
+        Food food = foodMapper.selectOne(foodQueryWrapper);
+        if (food == null){
+            return false;
+        }
+
+        food.setFoodLike(food.getFoodLike()-1);
+        food.setModTime(new Date());
+        int result = foodMapper.update(food, foodQueryWrapper);
+        if (result == 1){
+            return true;
+        }
+        return false;
+    }
+
     private RestaurantDetail fillRestaurantDetail(RestaurantInfo restaurantInfo){
         RestaurantDetail restaurantDetail = new RestaurantDetail();
 
@@ -88,7 +106,15 @@ public class RestaurantServiceImpl implements RestaurantService {
                 .eq("restaurant_id", restaurantId);
         List<Food> foodList = foodMapper.selectList(foodQueryWrapper);
         List<FoodOverView> foodOverViewList = fillFoodOverView(foodList, restaurantInfo.getRestaurantName());
+        // 按点赞数降序
+        Collections.sort(foodOverViewList, ((o1, o2) -> {
+            if (o1.getFoodLikes() < o2.getFoodLikes())
+                return 1;
+            else
+                return -1;
+        }));
         restaurantDetail.setFoodList(foodOverViewList);
+
         if (foodOverViewList.isEmpty()){
             restaurantDetail.setRestaurantLikes(0);
         }
@@ -116,6 +142,14 @@ public class RestaurantServiceImpl implements RestaurantService {
         List<Comment> commentList = commentMapper.selectList(commentQueryWrapper);
         List<RestaurantComment> restaurantCommentList = fillRestaurantComment(commentList);
         restaurantDetail.setCommentList(restaurantCommentList);
+
+        // 填充同类型餐厅，只填充六个
+        QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
+        restaurantInfoQueryWrapper.eq("has_delete", false)
+                .eq("restaurant_tag", restaurantInfo.getRestaurantTag());
+        List<RestaurantInfo> restaurantInfoList = restaurantInfoMapper.selectList(restaurantInfoQueryWrapper);
+        List<RestaurantOverView> restaurantOverViewList = fillSameTag(restaurantInfoList);
+        restaurantDetail.setSameTagList(restaurantOverViewList);
 
         return restaurantDetail;
     }
@@ -190,6 +224,62 @@ public class RestaurantServiceImpl implements RestaurantService {
         }
 
         return restaurantCommentList;
+    }
+
+    private List<RestaurantOverView> fillSameTag(List<RestaurantInfo> restaurantInfoList){
+        List<RestaurantOverView> restaurantOverViewList = new ArrayList<>();
+
+        if (restaurantInfoList.isEmpty()){
+            return restaurantOverViewList;
+        }
+
+        Iterator<RestaurantInfo> restaurantInfoIterator = restaurantInfoList.iterator();
+        while (restaurantInfoIterator.hasNext()){
+            RestaurantInfo next = restaurantInfoIterator.next();
+            RestaurantOverView restaurantOverView = new RestaurantOverView();
+
+            restaurantOverView.setRestaurantName(next.getRestaurantName());
+            restaurantOverView.setRestaurantTag(next.getRestaurantTag());
+            restaurantOverView.setRestaurantPosition(next.getRestaurantPosition());
+            restaurantOverView.setRestaurantImage(next.getRestaurantImage());
+            restaurantOverView.setRestaurantProvince(next.getRestaurantProvince());
+            restaurantOverView.setRestaurantCity(next.getRestaurantCity());
+            restaurantOverView.setRestaurantBlock(next.getRestaurantBlock());
+
+            // 填充点赞数
+            QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+            foodQueryWrapper.eq("has_delete", false)
+                    .eq("restaurant_id", next.getRestaurantId());
+            List<Food> foodList = foodMapper.selectList(foodQueryWrapper);
+            if (foodList.isEmpty()){
+                restaurantOverView.setLikes(0);
+            }
+            else {
+                Iterator<Food> foodIterator = foodList.iterator();
+                int likes = 0;
+                while (foodIterator.hasNext()){
+                    likes += foodIterator.next().getFoodLike();
+                }
+                restaurantOverView.setLikes(likes);
+            }
+
+            restaurantOverViewList.add(restaurantOverView);
+        }
+
+        // 按点赞数降序
+        Collections.sort(restaurantOverViewList, ((o1, o2) -> {
+            if (o1.getLikes() < o2.getLikes())
+                return 1;
+            else
+                return -1;
+        }));
+
+        // 截取前六个
+        if (restaurantInfoList.size() > 6){
+            restaurantOverViewList.subList(0, 6);
+        }
+
+        return restaurantOverViewList;
     }
 
 

@@ -147,7 +147,6 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
         return restaurantOverViewList;
     }
 
-    // todo 这个要写
     @Override
     public List<RestaurantOverView> nameRestaurantOverView(String name) {
         List<RestaurantOverView> restaurantOverViewList = new ArrayList<>();
