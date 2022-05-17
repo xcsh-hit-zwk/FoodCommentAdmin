@@ -7,7 +7,6 @@ import com.example.foodcommentadmin.service.RestaurantService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.dc.pr.PRError;
 
 import java.util.*;
 
@@ -459,7 +458,32 @@ public class RestaurantServiceImpl implements RestaurantService {
             commentLiked.setUserId(next.getUserId());
             commentLiked.setRestaurantId(next.getRestaurantId());
 
-            commentLikedList.add(commentLiked);
+            // 获取用户
+            QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+            userQueryWrapper.eq("has_delete", false)
+                            .eq("id", next.getUserId());
+            User user = userMapper.selectOne(userQueryWrapper);
+            // 获取餐厅
+            QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
+            restaurantInfoQueryWrapper.eq("has_delete", false)
+                            .eq("restaurant_id", next.getRestaurantId());
+            RestaurantInfo restaurantInfo = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
+
+            if (user != null && restaurantInfo != null){
+                // 填充数据
+                commentLiked.setUsername(user.getUserId());
+                commentLiked.setRestaurantName(restaurantInfo.getRestaurantName());
+                commentLikedList.add(commentLiked);
+            }
+            else {
+                // 清除错误数据
+                QueryWrapper<UserCommentLikeEntity> userCommentLikeEntityQueryWrapper = new QueryWrapper<>();
+                userCommentLikeEntityQueryWrapper.eq("has_delete", false)
+                        .eq("usercommentlike_id", next.getUsercommentlikeId());
+                next.setHasDelete(true);
+                next.setModTime(new Date());
+                userCommentLikeMapper.update(next, userCommentLikeEntityQueryWrapper);
+            }
         }
 
         return commentLikedList;
@@ -481,8 +505,38 @@ public class RestaurantServiceImpl implements RestaurantService {
             foodLiked.setUserId(next.getUserId());
             foodLiked.setFoodId(next.getFoodId());
             foodLiked.setRestaurantId(next.getRestaurantId());
+            // 获取用户
+            QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+            userQueryWrapper.eq("has_delete", false)
+                    .eq("id", next.getUserId());
+            User user = userMapper.selectOne(userQueryWrapper);
+            // 获取招牌菜
+            QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+            foodQueryWrapper.eq("has_delete", false)
+                            .eq("food_id", next.getFoodId());
+            Food food = foodMapper.selectOne(foodQueryWrapper);
+            // 获取餐厅
+            QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
+            restaurantInfoQueryWrapper.eq("has_delete", false)
+                            .eq("restaurant_id", next.getRestaurantId());
+            RestaurantInfo restaurantInfo = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
+            // 填充数据
+            if (user != null && food != null && restaurantInfo != null){
+                foodLiked.setUsername(user.getUserId());
+                foodLiked.setFoodName(food.getFoodName());
+                foodLiked.setRestaurantName(restaurantInfo.getRestaurantName());
 
-            foodLikedList.add(foodLiked);
+                foodLikedList.add(foodLiked);
+            }
+            else {
+                // 清除错误数据
+                QueryWrapper<UserFoodLikeEntity> userFoodLikeEntityQueryWrapper = new QueryWrapper<>();
+                userFoodLikeEntityQueryWrapper.eq("has_delete", false)
+                        .eq("userfoodlike_id", next.getUserfoodlikeId());
+                next.setHasDelete(true);
+                next.setModTime(new Date());
+                userFoodLikeMapper.update(next, userFoodLikeEntityQueryWrapper);
+            }
         }
 
         return foodLikedList;

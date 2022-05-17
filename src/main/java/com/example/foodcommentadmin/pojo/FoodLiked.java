@@ -13,5 +13,8 @@ public class FoodLiked {
     private String userId;
     private String foodId;
     private String restaurantId;
+    private String username;
+    private String foodName;
+    private String restaurantName;
 
 }

@@ -13,5 +13,7 @@ public class CommentLiked {
     private String commentId;
     private String userId;
     private String restaurantId;
+    private String username;
+    private String restaurantName;
 
 }
