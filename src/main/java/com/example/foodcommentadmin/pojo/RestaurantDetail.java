@@ -22,5 +22,7 @@ public class RestaurantDetail {
     private List<RestaurantComment> commentList;
     // 只要6个
     private List<RestaurantOverView> sameTagList;
+    private List<CommentLiked> likedCommentList;
+    private List<FoodLiked> likedFoodList;
 
 }

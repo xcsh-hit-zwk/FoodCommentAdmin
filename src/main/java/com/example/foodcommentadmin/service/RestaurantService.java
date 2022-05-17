@@ -13,9 +13,14 @@ public interface RestaurantService {
 
     RestaurantDetail getRestaurantDetail(String restaurantName);
 
-    Boolean addFoodLike(String foodName);
+    // todo 以下四个接口跟着客户端一起测试
+    Boolean addFoodLike(String username, String foodName, String restaurantName);
 
-    Boolean cancelFoodLike(String foodName);
+    Boolean cancelFoodLike(String username, String foodName, String restaurantName);
+
+    Boolean addCommentLike(String commentId, String username, String restaurantName);
+
+    Boolean cancelCommentLike(String commentId, String username, String restaurantName);
 
 //    /**
 //     * 餐厅招牌菜相关接口

@@ -7,6 +7,7 @@ import com.example.foodcommentadmin.service.RestaurantService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.dc.pr.PRError;
 
 import java.util.*;
 
@@ -36,6 +37,12 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private UserCommentLikeMapper userCommentLikeMapper;
+
+    @Autowired
+    private UserFoodLikeMapper userFoodLikeMapper;
+
     @Override
     public RestaurantDetail getRestaurantDetail(String restaurantName) {
         RestaurantDetail restaurantDetail;
@@ -52,7 +59,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Boolean addFoodLike(String foodName) {
+    public Boolean addFoodLike(String username, String foodName, String restaurantName) {
         QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
         foodQueryWrapper.eq("has_delete", false)
                 .eq("food_name", foodName);
@@ -65,13 +72,39 @@ public class RestaurantServiceImpl implements RestaurantService {
         food.setModTime(new Date());
         int result = foodMapper.update(food, foodQueryWrapper);
         if (result == 1){
-            return true;
+            String userId = getUserId(username);
+            String foodId = getFoodId(foodName);
+            String restaurantId = getRestaurantId(restaurantName);
+            QueryWrapper<UserFoodLikeEntity> userFoodLikeEntityQueryWrapper = new QueryWrapper<>();
+            userFoodLikeEntityQueryWrapper.eq("has_delete", false)
+                    .eq("user_id", userId)
+                    .eq("food_id", foodId)
+                    .eq("restaurant_id", restaurantId);
+            UserFoodLikeEntity userFoodLikeEntity = userFoodLikeMapper.selectOne(userFoodLikeEntityQueryWrapper);
+            // 如果点赞过了，就清除点赞记录
+            if (userFoodLikeEntity != null){
+                userFoodLikeEntity.setHasDelete(true);
+                userFoodLikeEntity.setModTime(new Date());
+                userFoodLikeMapper.update(userFoodLikeEntity, userFoodLikeEntityQueryWrapper);
+                return false;
+            }
+
+            userFoodLikeEntity = new UserFoodLikeEntity();
+            userFoodLikeEntity.setUserId(userId);
+            userFoodLikeEntity.setFoodId(foodId);
+            userFoodLikeEntity.setRestaurantId(restaurantId);
+
+            result = userFoodLikeMapper.insert(userFoodLikeEntity);
+            if (result == 1){
+                return true;
+            }
+            return false;
         }
         return false;
     }
 
     @Override
-    public Boolean cancelFoodLike(String foodName) {
+    public Boolean cancelFoodLike(String username, String foodName, String restaurantName) {
         QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
         foodQueryWrapper.eq("has_delete", false)
                 .eq("food_name", foodName);
@@ -84,7 +117,115 @@ public class RestaurantServiceImpl implements RestaurantService {
         food.setModTime(new Date());
         int result = foodMapper.update(food, foodQueryWrapper);
         if (result == 1){
-            return true;
+            String userId = getUserId(username);
+            String foodId = getFoodId(foodName);
+            String restaurantId = getRestaurantId(restaurantName);
+            QueryWrapper<UserFoodLikeEntity> userFoodLikeEntityQueryWrapper = new QueryWrapper<>();
+            userFoodLikeEntityQueryWrapper.eq("has_delete", false)
+                    .eq("user_id", userId)
+                    .eq("food_id", foodId)
+                    .eq("restaurant_id", restaurantId);
+            UserFoodLikeEntity userFoodLikeEntity = userFoodLikeMapper.selectOne(userFoodLikeEntityQueryWrapper);
+            if (userFoodLikeEntity == null){
+                return false;
+            }
+
+            userFoodLikeEntity.setHasDelete(true);
+            userFoodLikeEntity.setModTime(new Date());
+
+            result = userFoodLikeMapper.update(userFoodLikeEntity, userFoodLikeEntityQueryWrapper);
+            if (result == 1){
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean addCommentLike(String commentId, String username, String restaurantName) {
+        QueryWrapper<Comment> commentQueryWrapper = new QueryWrapper<>();
+        commentQueryWrapper.eq("has_delete", false)
+                .eq("comment_id", commentId);
+        Comment comment = commentMapper.selectOne(commentQueryWrapper);
+        if (comment == null){
+            return false;
+        }
+
+        int likes = comment.getCommentLike();
+        comment.setCommentLike(likes+1);
+        comment.setModTime(new Date());
+        int result = commentMapper.update(comment, commentQueryWrapper);
+        if (result == 1){
+
+            // 记录点赞
+            String userId = getUserId(username);
+            String restaurantId = getRestaurantId(restaurantName);
+            QueryWrapper<UserCommentLikeEntity> userCommentLikeEntityQueryWrapper = new QueryWrapper<>();
+            userCommentLikeEntityQueryWrapper.eq("has_delete", false)
+                    .eq("comment_id", commentId)
+                    .eq("user_id", userId)
+                    .eq("restaurant_id", restaurantId);
+            UserCommentLikeEntity userCommentLikeEntity = userCommentLikeMapper
+                    .selectOne(userCommentLikeEntityQueryWrapper);
+            // 如果点赞过了，就清除点赞记录
+            if (userCommentLikeEntity != null){
+                userCommentLikeEntity.setHasDelete(true);
+                userCommentLikeEntity.setModTime(new Date());
+                userCommentLikeMapper.update(userCommentLikeEntity, userCommentLikeEntityQueryWrapper);
+                return false;
+            }
+
+            userCommentLikeEntity = new UserCommentLikeEntity();
+            userCommentLikeEntity.setCommentId(commentId);
+            userCommentLikeEntity.setRestaurantId(restaurantId);
+            userCommentLikeEntity.setUserId(userId);
+
+            result = userCommentLikeMapper.insert(userCommentLikeEntity);
+            if (result == 1){
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean cancelCommentLike(String commentId, String username, String restaurantName) {
+        QueryWrapper<Comment> commentQueryWrapper = new QueryWrapper<>();
+        commentQueryWrapper.eq("has_delete", false)
+                .eq("comment_id", commentId);
+        Comment comment = commentMapper.selectOne(commentQueryWrapper);
+        if (comment == null){
+            return false;
+        }
+
+        int likes = comment.getCommentLike();
+        comment.setCommentLike(likes-1);
+        comment.setModTime(new Date());
+        int result = commentMapper.update(comment, commentQueryWrapper);
+        if (result == 1){
+            // 记录点赞
+            String userId = getUserId(username);
+            String restaurantId = getRestaurantId(restaurantName);
+            QueryWrapper<UserCommentLikeEntity> userCommentLikeEntityQueryWrapper = new QueryWrapper<>();
+            userCommentLikeEntityQueryWrapper.eq("has_delete", false)
+                    .eq("comment_id", commentId)
+                    .eq("user_id", userId)
+                    .eq("restaurant_id", restaurantId);
+            UserCommentLikeEntity userCommentLikeEntity = userCommentLikeMapper
+                    .selectOne(userCommentLikeEntityQueryWrapper);
+            if (userCommentLikeEntity == null){
+                return false;
+            }
+
+            userCommentLikeEntity.setModTime(new Date());
+            userCommentLikeEntity.setHasDelete(true);
+            result = userCommentLikeMapper.update(userCommentLikeEntity, userCommentLikeEntityQueryWrapper);
+            if (result == 1){
+                return true;
+            }
+            return false;
         }
         return false;
     }
@@ -151,6 +292,24 @@ public class RestaurantServiceImpl implements RestaurantService {
         List<RestaurantOverView> restaurantOverViewList = fillSameTag(restaurantInfoList);
         restaurantDetail.setSameTagList(restaurantOverViewList);
 
+        // 填充点赞过的评论
+        QueryWrapper<UserCommentLikeEntity> userCommentLikeEntityQueryWrapper = new QueryWrapper<>();
+        userCommentLikeEntityQueryWrapper.eq("has_delete", false)
+                .eq("restaurant_id", restaurantId);
+        List<UserCommentLikeEntity> userCommentLikeEntityList = userCommentLikeMapper
+                .selectList(userCommentLikeEntityQueryWrapper);
+        List<CommentLiked> commentLikedList = fillCommentLiked(userCommentLikeEntityList);
+        restaurantDetail.setLikedCommentList(commentLikedList);
+
+        // 填充点赞过的招牌菜
+        QueryWrapper<UserFoodLikeEntity> userFoodLikeEntityQueryWrapper = new QueryWrapper<>();
+        userFoodLikeEntityQueryWrapper.eq("has_delete", false)
+                .eq("restaurant_id", restaurantId);
+        List<UserFoodLikeEntity> userFoodLikeEntityList = userFoodLikeMapper
+                .selectList(userFoodLikeEntityQueryWrapper);
+        List<FoodLiked> foodLikedList = fillFoodLiked(userFoodLikeEntityList);
+        restaurantDetail.setLikedFoodList(foodLikedList);
+
         return restaurantDetail;
     }
 
@@ -202,6 +361,7 @@ public class RestaurantServiceImpl implements RestaurantService {
                 User user = userMapper.selectOne(userQueryWrapper);
                 if (user != null){
                     RestaurantComment restaurantComment = new RestaurantComment();
+                    restaurantComment.setCommentId(comment.getCommentId());
                     restaurantComment.setUsername(user.getUserId());
                     restaurantComment.setUserImage(user.getUserImage());
                     restaurantComment.setNickname(user.getNickname());
@@ -280,6 +440,88 @@ public class RestaurantServiceImpl implements RestaurantService {
         }
 
         return restaurantOverViewList;
+    }
+
+    private List<CommentLiked> fillCommentLiked(List<UserCommentLikeEntity> userCommentLikeEntityList){
+        List<CommentLiked> commentLikedList = new ArrayList<>();
+
+        if (userCommentLikeEntityList.isEmpty()){
+            return commentLikedList;
+        }
+
+        Iterator<UserCommentLikeEntity> iterator = userCommentLikeEntityList.iterator();
+        while (iterator.hasNext()){
+            UserCommentLikeEntity next = iterator.next();
+            CommentLiked commentLiked = new CommentLiked();
+
+            commentLiked.setUsercommentlikeId(next.getUsercommentlikeId());
+            commentLiked.setCommentId(next.getCommentId());
+            commentLiked.setUserId(next.getUserId());
+            commentLiked.setRestaurantId(next.getRestaurantId());
+
+            commentLikedList.add(commentLiked);
+        }
+
+        return commentLikedList;
+    }
+
+    private List<FoodLiked> fillFoodLiked(List<UserFoodLikeEntity> userFoodLikeEntityList){
+        List<FoodLiked> foodLikedList = new ArrayList<>();
+
+        if (userFoodLikeEntityList.isEmpty()){
+            return foodLikedList;
+        }
+
+        Iterator<UserFoodLikeEntity> iterator = userFoodLikeEntityList.iterator();
+        while (iterator.hasNext()){
+            UserFoodLikeEntity next = iterator.next();
+            FoodLiked foodLiked = new FoodLiked();
+
+            foodLiked.setUserfoodlikeId(next.getUserfoodlikeId());
+            foodLiked.setUserId(next.getUserId());
+            foodLiked.setFoodId(next.getFoodId());
+            foodLiked.setRestaurantId(next.getRestaurantId());
+
+            foodLikedList.add(foodLiked);
+        }
+
+        return foodLikedList;
+    }
+
+    private String getRestaurantId(String restaurantName){
+        QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
+        restaurantInfoQueryWrapper.eq("has_delete", false)
+                .eq("restaurant_name", restaurantName);
+        RestaurantInfo restaurantInfo = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
+        if (restaurantInfo == null){
+            return null;
+        }
+
+        return restaurantInfo.getRestaurantId();
+    }
+
+    private String getUserId(String username){
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("has_delete", false)
+                .eq("user_id", username);
+        User user = userMapper.selectOne(userQueryWrapper);
+        if (user == null){
+            return null;
+        }
+
+        return user.getId();
+    }
+
+    private String getFoodId(String foodName){
+        QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+        foodQueryWrapper.eq("has_delete", false)
+                .eq("food_name", foodName);
+        Food food = foodMapper.selectOne(foodQueryWrapper);
+        if (food == null){
+            return null;
+        }
+
+        return food.getFoodId();
     }
 
 
