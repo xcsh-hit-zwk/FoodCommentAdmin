@@ -7,6 +7,7 @@ import com.example.foodcommentadmin.pojo.LikeFood;
 import com.example.foodcommentadmin.pojo.RestaurantDetail;
 import com.example.foodcommentadmin.pojo.SearchInfo;
 import com.example.foodcommentadmin.service.RestaurantService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
  * @author: zhangweikun
  * @create: 2022-04-23 10:12
  **/
+@Slf4j
 @RestController
 @CrossOrigin
 @RequestMapping("/RestaurantDetail")

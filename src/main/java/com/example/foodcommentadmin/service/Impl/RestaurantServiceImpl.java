@@ -15,8 +15,6 @@ import java.util.*;
  * @author: zhangweikun
  * @create: 2022-04-23 09:26
  **/
-// todo 同类型餐厅返回还没写，以及排序
-// todo 招牌菜排序还没写
 @Service
 @Slf4j
 public class RestaurantServiceImpl implements RestaurantService {
@@ -150,6 +148,7 @@ public class RestaurantServiceImpl implements RestaurantService {
                 .eq("comment_id", commentId);
         Comment comment = commentMapper.selectOne(commentQueryWrapper);
         if (comment == null){
+            log.info("评论为空");
             return false;
         }
 
@@ -158,7 +157,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         comment.setModTime(new Date());
         int result = commentMapper.update(comment, commentQueryWrapper);
         if (result == 1){
-
+            log.info("点赞成功，开始记录点赞信息");
             // 记录点赞
             String userId = getUserId(username);
             String restaurantId = getRestaurantId(restaurantName);
@@ -171,6 +170,7 @@ public class RestaurantServiceImpl implements RestaurantService {
                     .selectOne(userCommentLikeEntityQueryWrapper);
             // 如果点赞过了，就清除点赞记录
             if (userCommentLikeEntity != null){
+                log.info("出现错误，清除该点赞记录");
                 userCommentLikeEntity.setHasDelete(true);
                 userCommentLikeEntity.setModTime(new Date());
                 userCommentLikeMapper.update(userCommentLikeEntity, userCommentLikeEntityQueryWrapper);
@@ -184,6 +184,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 
             result = userCommentLikeMapper.insert(userCommentLikeEntity);
             if (result == 1){
+                log.info("记录点赞成功");
                 return true;
             }
             return false;
@@ -198,6 +199,7 @@ public class RestaurantServiceImpl implements RestaurantService {
                 .eq("comment_id", commentId);
         Comment comment = commentMapper.selectOne(commentQueryWrapper);
         if (comment == null){
+            log.info("未能查询到评论，取消点赞失败");
             return false;
         }
 
@@ -206,7 +208,8 @@ public class RestaurantServiceImpl implements RestaurantService {
         comment.setModTime(new Date());
         int result = commentMapper.update(comment, commentQueryWrapper);
         if (result == 1){
-            // 记录点赞
+            log.info("取消点赞成功，开始删除点赞记录");
+            // 删除点赞记录
             String userId = getUserId(username);
             String restaurantId = getRestaurantId(restaurantName);
             QueryWrapper<UserCommentLikeEntity> userCommentLikeEntityQueryWrapper = new QueryWrapper<>();
@@ -217,6 +220,7 @@ public class RestaurantServiceImpl implements RestaurantService {
             UserCommentLikeEntity userCommentLikeEntity = userCommentLikeMapper
                     .selectOne(userCommentLikeEntityQueryWrapper);
             if (userCommentLikeEntity == null){
+                log.info("未能查询到点赞记录，出现错误");
                 return false;
             }
 
@@ -224,6 +228,7 @@ public class RestaurantServiceImpl implements RestaurantService {
             userCommentLikeEntity.setHasDelete(true);
             result = userCommentLikeMapper.update(userCommentLikeEntity, userCommentLikeEntityQueryWrapper);
             if (result == 1){
+                log.info("删除点赞记录成功");
                 return true;
             }
             return false;
