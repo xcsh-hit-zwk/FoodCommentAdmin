@@ -42,13 +42,15 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Autowired
     private UserFoodLikeMapper userFoodLikeMapper;
 
+    private RestaurantInfo restaurantInfo;
+
     @Override
     public RestaurantDetail getRestaurantDetail(String restaurantName) {
         RestaurantDetail restaurantDetail;
         QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
         restaurantInfoQueryWrapper.eq("has_delete", false)
                 .eq("restaurant_name", restaurantName);
-        RestaurantInfo restaurantInfo = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
+        restaurantInfo = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
         if (restaurantInfo == null){
             return null;
         }
@@ -433,8 +435,12 @@ public class RestaurantServiceImpl implements RestaurantService {
                 return -1;
         }));
 
-        // 截取前六个
+        // 截取前六个，并且去重
+        int position = restaurantInfoList.indexOf(restaurantInfo);
         if (restaurantInfoList.size() > 6){
+            if (position < 6){
+                restaurantOverViewList.remove(position);
+            }
             restaurantOverViewList.subList(0, 6);
         }
 
@@ -523,7 +529,11 @@ public class RestaurantServiceImpl implements RestaurantService {
             // 填充数据
             if (user != null && food != null && restaurantInfo != null){
                 foodLiked.setUsername(user.getUserId());
-                foodLiked.setFoodName(food.getFoodName());
+
+                String temp = food.getFoodName();
+                String foodName = temp.substring(temp.indexOf("-") + 1);
+                foodLiked.setFoodName(foodName);
+
                 foodLiked.setRestaurantName(restaurantInfo.getRestaurantName());
 
                 foodLikedList.add(foodLiked);
