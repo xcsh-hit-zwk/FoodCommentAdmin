@@ -23,10 +23,11 @@ public class Comment extends Model<Comment> {
     private String restaurantId;
     private String commentInfo;
 
-    @TableField(fill = FieldFill.INSERT)
-    private String commentTime;
-
     private Integer commentLike;
+
+    @TableField(fill = FieldFill.INSERT)
+    private Date commentTime;
+
     @TableField(fill = FieldFill.INSERT)
     private Boolean hasDelete;
 
