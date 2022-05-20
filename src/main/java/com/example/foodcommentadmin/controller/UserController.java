@@ -1,19 +1,15 @@
 package com.example.foodcommentadmin.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.example.foodcommentadmin.common.R;
 import com.example.foodcommentadmin.enums.ResultCode;
-import com.example.foodcommentadmin.pojo.Account;
-import com.example.foodcommentadmin.pojo.RegisterAccount;
-import com.example.foodcommentadmin.pojo.User;
-import com.example.foodcommentadmin.pojo.UserInfo;
+import com.example.foodcommentadmin.pojo.*;
 import com.example.foodcommentadmin.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import netscape.javascript.JSObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -59,5 +55,21 @@ public class UserController {
             return R.ok();
         }
         return R.setResult(ResultCode.USER_NOT_EXIST);
+    }
+
+    // searchWay = "ModifyUserComment", info = "%username"
+    @PostMapping("/ModifyUserComment")
+    public R ModifyUserComment(@Validated @RequestBody SearchInfo searchInfo){
+        String searchWay = searchInfo.getSearchWay();
+        String info = searchInfo.getInfo();
+        if (!searchWay.equals("ModifyUserComment")){
+            return R.setResult(ResultCode.WRONG_SEARCH);
+        }
+
+        List<UserInfoComment> userInfoCommentList = userService.getUserComment(info);
+        if (userInfoCommentList != null){
+            return R.ok().data(userInfoCommentList);
+        }
+        return R.setResult(ResultCode.EMPTY_SET);
     }
 }
