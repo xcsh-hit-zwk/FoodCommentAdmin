@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class UserInfoComment {
 
+    private String commentId;
     private String username;
     private String userImage;
     private String nickname;

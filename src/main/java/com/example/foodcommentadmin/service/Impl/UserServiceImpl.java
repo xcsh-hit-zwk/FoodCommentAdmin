@@ -122,6 +122,7 @@ public class UserServiceImpl implements UserService {
         while (commentIterator.hasNext()){
             Comment comment = commentIterator.next();
             UserInfoComment userInfoComment = new UserInfoComment();
+            userInfoComment.setCommentId(comment.getCommentId());
             userInfoComment.setUsername(user.getUserId());
             userInfoComment.setNickname(user.getNickname());
             userInfoComment.setUserImage(user.getUserImage());

@@ -16,4 +16,8 @@ public interface CommentService {
     String addComment(CommentAddEntity commentAddEntity);
 
     RestaurantComment getComment(String commentId);
+
+    Boolean modifyComment(String commentId, String commentInfo);
+
+    Boolean deleteComment(String commentId);
 }

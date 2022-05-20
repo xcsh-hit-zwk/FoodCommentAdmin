@@ -3,12 +3,17 @@ package com.example.foodcommentadmin.service.Impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.foodcommentadmin.mapper.CommentMapper;
 import com.example.foodcommentadmin.mapper.RestaurantInfoMapper;
+import com.example.foodcommentadmin.mapper.UserCommentLikeMapper;
 import com.example.foodcommentadmin.mapper.UserMapper;
 import com.example.foodcommentadmin.pojo.*;
 import com.example.foodcommentadmin.service.CommentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author: zhangweikun
@@ -26,6 +31,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Autowired
     private RestaurantInfoMapper restaurantInfoMapper;
+
+    @Autowired
+    private UserCommentLikeMapper userCommentLikeMapper;
 
     /**
      * @param commentAddEntity
@@ -92,5 +100,62 @@ public class CommentServiceImpl implements CommentService {
         restaurantComment.setNickname(user.getNickname());
 
         return restaurantComment;
+    }
+
+    @Override
+    public Boolean modifyComment(String commentId, String commentInfo) {
+        QueryWrapper<Comment> commentQueryWrapper = new QueryWrapper<>();
+        commentQueryWrapper.eq("has_delete", false)
+                .eq("comment_id", commentId);
+        Comment comment = commentMapper.selectOne(commentQueryWrapper);
+        if (comment == null){
+            return false;
+        }
+
+        comment.setCommentInfo(commentInfo);
+        comment.setModTime(new Date());
+        int result = commentMapper.update(comment, commentQueryWrapper);
+        if (result == 1){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean deleteComment(String commentId) {
+        QueryWrapper<Comment> commentQueryWrapper = new QueryWrapper<>();
+        commentQueryWrapper.eq("has_delete", false)
+                .eq("comment_id", commentId);
+        Comment comment = commentMapper.selectOne(commentQueryWrapper);
+        if (comment == null){
+            return false;
+        }
+
+        comment.setHasDelete(true);
+        comment.setModTime(new Date());
+        int result = commentMapper.update(comment, commentQueryWrapper);
+        if (result == 1){
+            QueryWrapper<UserCommentLikeEntity> userCommentLikeEntityQueryWrapper = new QueryWrapper<>();
+            userCommentLikeEntityQueryWrapper.eq("has_delete", false)
+                    .eq("comment_id", commentId);
+            List<UserCommentLikeEntity> userCommentLikeEntityList = userCommentLikeMapper
+                    .selectList(userCommentLikeEntityQueryWrapper);
+            if (!!userCommentLikeEntityList.isEmpty()){
+                // 清空点赞记录
+                Iterator<UserCommentLikeEntity> userCommentLikeEntityIterator = userCommentLikeEntityList.iterator();
+                while (userCommentLikeEntityIterator.hasNext()){
+                    UserCommentLikeEntity userCommentLikeEntity = userCommentLikeEntityIterator.next();
+                    QueryWrapper<UserCommentLikeEntity> delete = new QueryWrapper<>();
+                    delete.eq("has_delete", false)
+                            .eq("usercommentlike_id", userCommentLikeEntity.getUsercommentlikeId());
+                    UserCommentLikeEntity temp = userCommentLikeMapper.selectOne(delete);
+                    temp.setModTime(new Date());
+                    temp.setHasDelete(true);
+                    userCommentLikeMapper.update(temp, delete);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }

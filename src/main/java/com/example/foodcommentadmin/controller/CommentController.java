@@ -48,4 +48,36 @@ public class CommentController {
         return R.setResult(ResultCode.EMPTY_SET);
     }
 
+    // searchWay = "%comment_id" info = "%comment_info"
+    @PostMapping("/ModifyComment")
+    public R modifyComment(@Validated @RequestBody SearchInfo searchInfo){
+        String commentId = searchInfo.getSearchWay();
+        String commentInfo = searchInfo.getInfo();
+        if (commentId == null || commentInfo == null){
+            return R.setResult(ResultCode.WRONG_SEARCH);
+        }
+
+        Boolean success = commentService.modifyComment(commentId, commentInfo);
+        if (success == true){
+            return R.ok();
+        }
+        return R.setResult(ResultCode.SOME_UPDATE_FAILED);
+    }
+
+    // searchWay = "DeleteComment" info = "%comment_id"
+    @PostMapping("/DeleteComment")
+    public R deleteComment(@Validated @RequestBody SearchInfo searchInfo){
+        String searchWay = searchInfo.getSearchWay();
+        String commentId = searchInfo.getInfo();
+        if (!searchWay.equals("DeleteComment") || commentId == null){
+            return R.setResult(ResultCode.WRONG_SEARCH);
+        }
+
+        Boolean success = commentService.deleteComment(commentId);
+        if (success == true){
+            return R.ok();
+        }
+        return R.setResult(ResultCode.SOME_DELETE_FAILED);
+    }
+
 }
