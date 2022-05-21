@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @description: 餐厅相关信息的Controller
  * @author: zhangweikun
@@ -46,33 +48,8 @@ public class RestaurantController {
     }
 
     @PostMapping("/AddFoodLike")
-    public R addFoodLike(@Validated @RequestBody LikeFood likeFood){
-        String username = likeFood.getUsername();
-        String restaurantName = likeFood.getRestaurantName();
-        String foodName = likeFood.getFoodName();
-        if (username == null || restaurantName == null || foodName == null){
-            return R.setResult(ResultCode.WRONG_SEARCH);
-        }
-
-        Boolean answer = restaurantService
-                .addFoodLike(username, restaurantName + "-" + foodName, restaurantName);
-        if(answer == true){
-            return R.ok();
-        }
-        return R.setResult(ResultCode.SOME_INSERT_FAILED);
-    }
-
-    @PostMapping("/CancelFoodLike")
-    public R cancelFoodLike(@Validated @RequestBody LikeFood likeFood){
-        String username = likeFood.getUsername();
-        String restaurantName = likeFood.getRestaurantName();
-        String foodName = likeFood.getFoodName();
-        if (username == null || restaurantName == null || foodName == null){
-            return R.setResult(ResultCode.WRONG_SEARCH);
-        }
-
-        Boolean answer = restaurantService
-                .cancelFoodLike(username, restaurantName + "-" + foodName, restaurantName);
+    public R addFoodLike(@Validated @RequestBody List<LikeFood> likeFoodList){
+        Boolean answer = restaurantService.addFoodLike(likeFoodList);
         if(answer == true){
             return R.ok();
         }
@@ -89,22 +66,6 @@ public class RestaurantController {
         }
 
         Boolean success = restaurantService.addCommentLike(commentId, username, restaurantName);
-        if (success == true){
-            return R.ok();
-        }
-        return R.setResult(ResultCode.SOME_INSERT_FAILED);
-    }
-
-    @PostMapping("/CancelCommentLike")
-    public R cancelCommentLike(@Validated @RequestBody LikeComment likeComment){
-        String commentId = likeComment.getCommentId();
-        String username = likeComment.getUsername();
-        String restaurantName = likeComment.getRestaurantName();
-        if (commentId == null || username == null || restaurantName == null){
-            return R.setResult(ResultCode.WRONG_SEARCH);
-        }
-
-        Boolean success = restaurantService.cancelCommentLike(commentId, username, restaurantName);
         if (success == true){
             return R.ok();
         }
