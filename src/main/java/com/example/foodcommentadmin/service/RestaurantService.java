@@ -13,7 +13,6 @@ public interface RestaurantService {
 
     RestaurantDetail getRestaurantDetail(String restaurantName);
 
-    // todo 以下四个接口跟着客户端一起测试
     Boolean addFoodLike(String username, String foodName, String restaurantName);
 
     Boolean cancelFoodLike(String username, String foodName, String restaurantName);

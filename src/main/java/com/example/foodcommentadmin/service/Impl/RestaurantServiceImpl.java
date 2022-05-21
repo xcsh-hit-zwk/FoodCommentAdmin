@@ -290,6 +290,14 @@ public class RestaurantServiceImpl implements RestaurantService {
         List<RestaurantComment> restaurantCommentList = fillRestaurantComment(commentList);
         restaurantDetail.setCommentList(restaurantCommentList);
 
+        // 按点赞数降序
+        Collections.sort(restaurantCommentList, ((o1, o2) -> {
+            if (o1.getCommentLike() < o2.getCommentLike())
+                return 1;
+            else
+                return -1;
+        }));
+
         // 填充同类型餐厅，只填充六个
         QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
         restaurantInfoQueryWrapper.eq("has_delete", false)
@@ -442,11 +450,11 @@ public class RestaurantServiceImpl implements RestaurantService {
 
         // 截取前六个，并且去重
         int position = restaurantInfoList.indexOf(restaurantInfo);
+        restaurantOverViewList.remove(position);
         if (restaurantInfoList.size() > 6){
             if (position < 6){
-                restaurantOverViewList.remove(position);
+                restaurantOverViewList.subList(0, 6);
             }
-            restaurantOverViewList.subList(0, 6);
         }
 
         return restaurantOverViewList;
