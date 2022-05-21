@@ -57,15 +57,8 @@ public class RestaurantController {
     }
 
     @PostMapping("/AddCommentLike")
-    public R addCommentLike(@Validated @RequestBody LikeComment likeComment){
-        String commentId = likeComment.getCommentId();
-        String username = likeComment.getUsername();
-        String restaurantName = likeComment.getRestaurantName();
-        if (commentId == null || username == null || restaurantName == null){
-            return R.setResult(ResultCode.WRONG_SEARCH);
-        }
-
-        Boolean success = restaurantService.addCommentLike(commentId, username, restaurantName);
+    public R addCommentLike(@Validated @RequestBody List<LikeComment> likeCommentList){
+        Boolean success = restaurantService.addCommentLike(likeCommentList);
         if (success == true){
             return R.ok();
         }

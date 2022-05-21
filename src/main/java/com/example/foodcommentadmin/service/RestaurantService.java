@@ -15,7 +15,7 @@ public interface RestaurantService {
 
     Boolean addFoodLike(List<LikeFood> likeFoodList);
 
-    Boolean addCommentLike(String commentId, String username, String restaurantName);
+    Boolean addCommentLike(List<LikeComment> likeCommentList);
 
 //    /**
 //     * 餐厅招牌菜相关接口

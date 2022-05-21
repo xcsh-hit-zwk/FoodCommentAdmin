@@ -60,8 +60,15 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public Boolean addFoodLike(List<LikeFood> likeFoodList) {
         // 清空表
+        QueryWrapper<User> temp = new QueryWrapper<>();
+        temp.eq("has_delete", false)
+                .eq("user_id", likeFoodList.get(0).getUsername());
+        User u = userMapper.selectOne(temp);
+        String userId = u.getId();
+
         QueryWrapper<UserFoodLikeEntity> userFoodLikeEntityQueryWrapper = new QueryWrapper<>();
-        userFoodLikeEntityQueryWrapper.eq("has_delete", false);
+        userFoodLikeEntityQueryWrapper.eq("has_delete", false)
+                .eq("user_id", userId);
         List<UserFoodLikeEntity> userFoodLikeEntityList = userFoodLikeMapper
                 .selectList(userFoodLikeEntityQueryWrapper);
         userFoodLikeMapper.delete(userFoodLikeEntityQueryWrapper);
@@ -125,54 +132,77 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Boolean addCommentLike(String commentId, String username, String restaurantName) {
-        QueryWrapper<Comment> commentQueryWrapper = new QueryWrapper<>();
-        commentQueryWrapper.eq("has_delete", false)
-                .eq("comment_id", commentId);
-        Comment comment = commentMapper.selectOne(commentQueryWrapper);
-        if (comment == null){
-            log.info("评论为空");
-            return false;
+    public Boolean addCommentLike(List<LikeComment> likeCommentList) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("has_delete", false)
+                .eq("user_id", likeCommentList.get(0).getUsername());
+        User u = userMapper.selectOne(queryWrapper);
+        String userId = u.getId();
+
+        QueryWrapper<UserCommentLikeEntity> userCommentLikeEntityQueryWrapper = new QueryWrapper<>();
+        userCommentLikeEntityQueryWrapper.eq("has_delete", false)
+                .eq("user_id", userId);
+        List<UserCommentLikeEntity> userCommentLikeEntityList = userCommentLikeMapper
+                .selectList(userCommentLikeEntityQueryWrapper);
+        userCommentLikeMapper.delete(userCommentLikeEntityQueryWrapper);
+
+        Iterator<UserCommentLikeEntity> userCommentLikeEntityIterator = userCommentLikeEntityList.iterator();
+        while (userCommentLikeEntityIterator.hasNext()){
+            UserCommentLikeEntity userCommentLikeEntity = userCommentLikeEntityIterator.next();
+            String commentId = userCommentLikeEntity.getCommentId();
+            QueryWrapper<Comment> commentQueryWrapper = new QueryWrapper<>();
+            commentQueryWrapper.eq("has_delete", false)
+                    .eq("comment_id", commentId);
+            Comment comment = commentMapper.selectOne(commentQueryWrapper);
+
+            if (comment != null){
+                comment.setCommentLike(comment.getCommentLike()-1);
+                comment.setModTime(new Date());
+                commentMapper.update(comment, commentQueryWrapper);
+            }
         }
 
-        int likes = comment.getCommentLike();
-        comment.setCommentLike(likes+1);
-        comment.setModTime(new Date());
-        int result = commentMapper.update(comment, commentQueryWrapper);
-        if (result == 1){
-            log.info("点赞成功，开始记录点赞信息");
-            // 记录点赞
-            String userId = getUserId(username);
-            String restaurantId = getRestaurantId(restaurantName);
-            QueryWrapper<UserCommentLikeEntity> userCommentLikeEntityQueryWrapper = new QueryWrapper<>();
-            userCommentLikeEntityQueryWrapper.eq("has_delete", false)
-                    .eq("comment_id", commentId)
-                    .eq("user_id", userId)
-                    .eq("restaurant_id", restaurantId);
-            UserCommentLikeEntity userCommentLikeEntity = userCommentLikeMapper
-                    .selectOne(userCommentLikeEntityQueryWrapper);
-            // 如果点赞过了，就清除点赞记录
-            if (userCommentLikeEntity != null){
-                log.info("出现错误，清除该点赞记录");
-                userCommentLikeEntity.setHasDelete(true);
-                userCommentLikeEntity.setModTime(new Date());
-                userCommentLikeMapper.update(userCommentLikeEntity, userCommentLikeEntityQueryWrapper);
-                return false;
-            }
+        Boolean success = false;
 
-            userCommentLikeEntity = new UserCommentLikeEntity();
-            userCommentLikeEntity.setCommentId(commentId);
-            userCommentLikeEntity.setRestaurantId(restaurantId);
-            userCommentLikeEntity.setUserId(userId);
+        // 开始全量同步
+        Iterator<LikeComment> likeCommentIterator = likeCommentList.iterator();
+        while (likeCommentIterator.hasNext()){
+            LikeComment likeComment = likeCommentIterator.next();
+            UserCommentLikeEntity userCommentLikeEntity = new UserCommentLikeEntity();
 
-            result = userCommentLikeMapper.insert(userCommentLikeEntity);
-            if (result == 1){
-                log.info("记录点赞成功");
-                return true;
+            // 获取用户ID
+            QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+            userQueryWrapper.eq("has_delete", false)
+                    .eq("user_id", likeComment.getUsername());
+            User user = userMapper.selectOne(userQueryWrapper);
+
+            // 获取餐厅id
+            QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
+            restaurantInfoQueryWrapper.eq("has_delete", false)
+                    .eq("restaurant_name", likeComment.getRestaurantName());
+            RestaurantInfo restaurantInfo = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
+
+            // 获取评论id
+            QueryWrapper<Comment> commentQueryWrapper = new QueryWrapper<>();
+            commentQueryWrapper.eq("has_delete", false)
+                    .eq("comment_id", likeComment.getCommentId());
+            Comment comment = commentMapper.selectOne(commentQueryWrapper);
+
+            if (user != null && restaurantInfo != null && comment != null){
+                userCommentLikeEntity.setCommentId(likeComment.getCommentId());
+                userCommentLikeEntity.setUserId(user.getId());
+                userCommentLikeEntity.setRestaurantId(restaurantInfo.getRestaurantId());
+
+                userCommentLikeMapper.insert(userCommentLikeEntity);
+
+                comment.setCommentLike(comment.getCommentLike()+1);
+                comment.setModTime(new Date());
+                commentMapper.update(comment, commentQueryWrapper);
+                success = true;
             }
-            return false;
         }
-        return false;
+
+        return success;
     }
 
     private RestaurantDetail fillRestaurantDetail(RestaurantInfo restaurantInfo){
