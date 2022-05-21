@@ -72,4 +72,18 @@ public class UserController {
         }
         return R.setResult(ResultCode.EMPTY_SET);
     }
+
+    // searchWay = "GetUserImage", info = "%username"
+    @PostMapping("/GetUserImage")
+    public R getUserImage(@Validated @RequestBody SearchInfo searchInfo){
+        if (!searchInfo.getSearchWay().equals("GetUserImage")){
+            return R.setResult(ResultCode.WRONG_SEARCH);
+        }
+
+        String userImage = userService.getUserImage(searchInfo.getInfo());
+        if (userImage != null){
+            return R.ok().data(userImage);
+        }
+        return R.setResult(ResultCode.EMPTY_SET);
+    }
 }

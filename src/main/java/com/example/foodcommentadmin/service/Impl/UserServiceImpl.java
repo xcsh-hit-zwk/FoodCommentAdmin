@@ -57,6 +57,7 @@ public class UserServiceImpl implements UserService {
             user.setUserId(registerAccount.getUsername());
             user.setPassword(registerAccount.getPassword());
             user.setNickname(registerAccount.getNickname());
+            user.setUserImage(registerAccount.getImageUrl());
 
             userMapper.insert(user);
             return true;
@@ -147,5 +148,18 @@ public class UserServiceImpl implements UserService {
         }
 
         return userInfoCommentList;
+    }
+
+    @Override
+    public String getUserImage(String username) {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("has_delete", false)
+                .eq("user_id", username);
+        User user = userMapper.selectOne(userQueryWrapper);
+        if (user == null){
+            return null;
+        }
+
+        return user.getUserImage();
     }
 }

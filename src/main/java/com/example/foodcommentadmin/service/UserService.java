@@ -15,4 +15,6 @@ public interface UserService {
     Boolean updateUserInfo(UserInfo userInfo);
 
     List<UserInfoComment> getUserComment(String username);
+
+    String getUserImage(String username);
 }
