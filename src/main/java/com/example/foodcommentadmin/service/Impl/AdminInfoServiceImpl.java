@@ -198,7 +198,6 @@ public class AdminInfoServiceImpl implements AdminInfoService {
     @Override
     public Boolean deleteRestaurant(RestaurantOverView restaurantOverView) {
 
-
         QueryWrapper<RestaurantInfo> restaurantInfoQueryWrapper = new QueryWrapper<>();
         restaurantInfoQueryWrapper.eq("has_delete", false)
                 .eq("restaurant_name", restaurantOverView.getRestaurantName())

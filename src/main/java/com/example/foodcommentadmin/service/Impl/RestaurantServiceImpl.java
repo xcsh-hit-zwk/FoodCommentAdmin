@@ -66,9 +66,17 @@ public class RestaurantServiceImpl implements RestaurantService {
         User u = userMapper.selectOne(temp);
         String userId = u.getId();
 
+        QueryWrapper<RestaurantInfo> res = new QueryWrapper<>();
+        res.eq("has_delete", false)
+                .eq("restaurant_name", likeFoodList.get(0).getRestaurantName());
+        RestaurantInfo r = restaurantInfoMapper.selectOne(res);
+        String restaurantId = r.getRestaurantId();
+
         QueryWrapper<UserFoodLikeEntity> userFoodLikeEntityQueryWrapper = new QueryWrapper<>();
         userFoodLikeEntityQueryWrapper.eq("has_delete", false)
-                .eq("user_id", userId);
+                .eq("user_id", userId)
+                .eq("restaurant_id", restaurantId);
+
         List<UserFoodLikeEntity> userFoodLikeEntityList = userFoodLikeMapper
                 .selectList(userFoodLikeEntityQueryWrapper);
         userFoodLikeMapper.delete(userFoodLikeEntityQueryWrapper);
@@ -139,9 +147,16 @@ public class RestaurantServiceImpl implements RestaurantService {
         User u = userMapper.selectOne(queryWrapper);
         String userId = u.getId();
 
+        QueryWrapper<RestaurantInfo> rqw = new QueryWrapper<>();
+        rqw.eq("has_delete", false)
+                .eq("restaurant_name", likeCommentList.get(0).getRestaurantName());
+        RestaurantInfo r = restaurantInfoMapper.selectOne(rqw);
+        String restaurantId = r.getRestaurantId();
+
         QueryWrapper<UserCommentLikeEntity> userCommentLikeEntityQueryWrapper = new QueryWrapper<>();
         userCommentLikeEntityQueryWrapper.eq("has_delete", false)
-                .eq("user_id", userId);
+                .eq("user_id", userId)
+                .eq("restaurant_id", restaurantId);
         List<UserCommentLikeEntity> userCommentLikeEntityList = userCommentLikeMapper
                 .selectList(userCommentLikeEntityQueryWrapper);
         userCommentLikeMapper.delete(userCommentLikeEntityQueryWrapper);
@@ -379,34 +394,36 @@ public class RestaurantServiceImpl implements RestaurantService {
         Iterator<RestaurantInfo> restaurantInfoIterator = restaurantInfoList.iterator();
         while (restaurantInfoIterator.hasNext()){
             RestaurantInfo next = restaurantInfoIterator.next();
-            RestaurantOverView restaurantOverView = new RestaurantOverView();
+            if (!next.equals(restaurantInfo)){
+                RestaurantOverView restaurantOverView = new RestaurantOverView();
 
-            restaurantOverView.setRestaurantName(next.getRestaurantName());
-            restaurantOverView.setRestaurantTag(next.getRestaurantTag());
-            restaurantOverView.setRestaurantPosition(next.getRestaurantPosition());
-            restaurantOverView.setRestaurantImage(next.getRestaurantImage());
-            restaurantOverView.setRestaurantProvince(next.getRestaurantProvince());
-            restaurantOverView.setRestaurantCity(next.getRestaurantCity());
-            restaurantOverView.setRestaurantBlock(next.getRestaurantBlock());
+                restaurantOverView.setRestaurantName(next.getRestaurantName());
+                restaurantOverView.setRestaurantTag(next.getRestaurantTag());
+                restaurantOverView.setRestaurantPosition(next.getRestaurantPosition());
+                restaurantOverView.setRestaurantImage(next.getRestaurantImage());
+                restaurantOverView.setRestaurantProvince(next.getRestaurantProvince());
+                restaurantOverView.setRestaurantCity(next.getRestaurantCity());
+                restaurantOverView.setRestaurantBlock(next.getRestaurantBlock());
 
-            // 填充点赞数
-            QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
-            foodQueryWrapper.eq("has_delete", false)
-                    .eq("restaurant_id", next.getRestaurantId());
-            List<Food> foodList = foodMapper.selectList(foodQueryWrapper);
-            if (foodList.isEmpty()){
-                restaurantOverView.setLikes(0);
-            }
-            else {
-                Iterator<Food> foodIterator = foodList.iterator();
-                int likes = 0;
-                while (foodIterator.hasNext()){
-                    likes += foodIterator.next().getFoodLike();
+                // 填充点赞数
+                QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+                foodQueryWrapper.eq("has_delete", false)
+                        .eq("restaurant_id", next.getRestaurantId());
+                List<Food> foodList = foodMapper.selectList(foodQueryWrapper);
+                if (foodList.isEmpty()){
+                    restaurantOverView.setLikes(0);
                 }
-                restaurantOverView.setLikes(likes);
-            }
+                else {
+                    Iterator<Food> foodIterator = foodList.iterator();
+                    int likes = 0;
+                    while (foodIterator.hasNext()){
+                        likes += foodIterator.next().getFoodLike();
+                    }
+                    restaurantOverView.setLikes(likes);
+                }
 
-            restaurantOverViewList.add(restaurantOverView);
+                restaurantOverViewList.add(restaurantOverView);
+            }
         }
 
         // 按点赞数降序
@@ -418,12 +435,8 @@ public class RestaurantServiceImpl implements RestaurantService {
         }));
 
         // 截取前六个，并且去重
-        int position = restaurantInfoList.indexOf(restaurantInfo);
-        restaurantOverViewList.remove(position);
         if (restaurantInfoList.size() > 6){
-            if (position < 6){
-                restaurantOverViewList.subList(0, 6);
-            }
+            restaurantOverViewList.subList(0, 6);
         }
 
         return restaurantOverViewList;

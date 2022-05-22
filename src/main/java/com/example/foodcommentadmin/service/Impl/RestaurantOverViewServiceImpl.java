@@ -102,7 +102,9 @@ public class RestaurantOverViewServiceImpl implements RestaurantOverViewService 
                     .eq("restaurant_id", next.getRestaurantId());
             RestaurantInfo restaurantInfo = restaurantInfoMapper.selectOne(restaurantInfoQueryWrapper);
             if(restaurantInfo != null){
-                restaurantInfoList.add(restaurantInfo);
+                if (!restaurantInfoList.contains(restaurantInfo)){
+                    restaurantInfoList.add(restaurantInfo);
+                }
             }
             // 纠错
             else {
